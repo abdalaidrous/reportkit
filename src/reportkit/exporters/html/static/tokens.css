@@ -1,0 +1,25 @@
+:root {
+    --rk-font-family: "Inter", "Noto Sans Arabic", Arial, sans-serif;
+    --rk-color-primary: #2563eb;
+    --rk-color-text: #172033;
+    --rk-color-muted: #64748b;
+    --rk-color-border: #e2e8f0;
+    --rk-color-surface: #ffffff;
+    --rk-color-subtle: #f8fafc;
+    --rk-space-1: 4px;
+    --rk-space-2: 8px;
+    --rk-space-3: 12px;
+    --rk-space-4: 16px;
+    --rk-space-5: 24px;
+    --rk-space-6: 32px;
+    --rk-space-7: 48px;
+    --rk-radius-sm: 6px;
+    --rk-radius-md: 10px;
+    --rk-radius-lg: 16px;
+    --rk-font-xs: 11px;
+    --rk-font-sm: 13px;
+    --rk-font-md: 14px;
+    --rk-font-lg: 18px;
+    --rk-font-xl: 24px;
+    --rk-font-2xl: 30px;
+}

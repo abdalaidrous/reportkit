@@ -2,6 +2,7 @@ from ...core.component import Component
 from ...rendering.context import RenderingContext
 from .registry import HtmlRendererRegistry
 from .renderers.base import BaseHtmlRenderer
+from .templates import HtmlTemplateEngine
 
 
 class HtmlRenderingEngine:
@@ -9,11 +10,12 @@ class HtmlRenderingEngine:
     Coordinate HTML rendering using registered component renderers.
     """
 
-    def __init__(self, registry=None):
+    def __init__(self, registry=None, templates=None):
         """
-        Initialize the rendering engine.
+        Initialize the rendering engine and shared templates.
         """
-        self.registry = registry or HtmlRendererRegistry
+        self.registry = registry if registry is not None else HtmlRendererRegistry
+        self.templates = templates if templates is not None else HtmlTemplateEngine()
 
     def render(self, component: Component, context: RenderingContext) -> str:
         """

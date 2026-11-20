@@ -1,0 +1,45 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    background: #f1f5f9;
+}
+
+body {
+    margin: 0;
+    color: var(--rk-color-text);
+    font-family: var(--rk-font-family);
+    font-size: var(--rk-font-md);
+    line-height: 1.7;
+}
+
+.rk-report {
+    max-width: 1120px;
+    margin: 32px auto;
+    padding: var(--rk-space-7);
+    background: var(--rk-color-surface);
+    border: 1px solid var(--rk-color-border);
+    border-radius: var(--rk-radius-lg);
+}
+
+.rk-page {
+    min-width: 0;
+}
+
+.rk-divider {
+    height: 1px;
+    margin: var(--rk-space-5) 0;
+    border: 0;
+    background: var(--rk-color-border);
+}
+
+[dir="rtl"] {
+    text-align: right;
+}
+
+[dir="ltr"] {
+    text-align: left;
+}

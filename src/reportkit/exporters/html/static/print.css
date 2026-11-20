@@ -1,0 +1,31 @@
+@page {
+    size: A4;
+    margin: 15mm;
+}
+
+@media print {
+    html,
+    body {
+        background: #ffffff;
+    }
+
+    .rk-report {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        border: none;
+        border-radius: 0;
+    }
+
+    .rk-card {
+        break-inside: avoid;
+    }
+
+    .rk-page-break {
+        break-after: page;
+    }
+
+    .rk-no-print {
+        display: none !important;
+    }
+}

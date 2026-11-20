@@ -1,0 +1,36 @@
+.rk-text {
+    margin: 0 0 var(--rk-space-3);
+    color: var(--rk-color-text);
+    font-size: var(--rk-font-md);
+    line-height: 1.8;
+}
+
+.rk-heading {
+    margin: 0 0 var(--rk-space-4);
+    color: var(--rk-color-text);
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.rk-heading--1 {
+    font-size: var(--rk-font-2xl);
+    letter-spacing: -0.5px;
+}
+
+.rk-heading--2 {
+    font-size: var(--rk-font-xl);
+}
+
+.rk-heading--3 {
+    font-size: var(--rk-font-lg);
+}
+
+.rk-muted {
+    color: var(--rk-color-muted);
+}
+
+.rk-label {
+    font-size: var(--rk-font-xs);
+    font-weight: 600;
+    color: var(--rk-color-muted);
+}
