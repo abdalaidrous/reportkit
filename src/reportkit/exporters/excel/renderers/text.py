@@ -15,10 +15,7 @@ class TextRenderer:
         """
         Write the text and return the single row it uses.
         """
-        text = cell_value(component_text(component))
-        engine.sheet.write(region.row, region.column, text, self.get_style(component, context))
-        engine.sheet.merge(region.row, region.column, region.width)
-        engine.sheet.set_row_height(region.row, 15 * (text.count("\n") + 1))
+        engine.sheet.place(region.row, region.column, region.width, cell_value(component_text(component)), self.get_style(component, context))
         return 1
 
     def get_style(self, component, context):

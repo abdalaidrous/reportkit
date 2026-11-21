@@ -1,30 +1,33 @@
 from ....components.table import TableCell
 from ....styles.style import Style
 from ....validators.table.table import TableValidator
-from ..styles import table_styles
+from ..exceptions import ExcelExportError
+from ..styles import table_styles, token
 from ..values import component_text, number_format
+from .base import distribute, track_shares
+
+MIN_COLUMN_CHARACTERS = 12
 
 
 class TableRenderer:
     """
-    Render a Table in the formatted mode: caption, header, prepared rows and footer, with spans and table styles.
+    Render a Table in the formatted mode: caption, header, prepared rows and footer, sized and framed like the PDF.
     """
 
     def render(self, component, context, engine, region):
         """
         Write the table rows in the order they arrive and return the rows used.
         """
-        styles, occupied = table_styles(), set()
+        styles, occupied, widths = table_styles(context.resolve_style(component)), set(), self.get_widths(component, engine, region)
         row = region.row + self.render_caption(component, context, engine, region)
-        row += self.render_header(component, engine, region.below(row - region.row), styles)
+        row += self.render_header(component, engine, region.below(row - region.row), styles, widths)
         for index, table_row in enumerate(component.rows):
             TableValidator.validate_row(table_row)
-            self.render_row(component, table_row, index, engine, region.below(row - region.row), styles, occupied)
-            row += 1
+            row += self.render_row(component, table_row, index, engine, region.below(row - region.row), styles, widths, occupied)
         if component.footer:
-            self.render_row(component, component.footer, 0, engine, region.below(row - region.row), styles, occupied)
-            row += 1
-        self.set_widths(component, engine, region)
+            row += self.render_row(component, component.footer, 0, engine, region.below(row - region.row), styles, widths, occupied)
+        if not component.table_style.ruled:
+            engine.sheet.outline(region.row, region.column, sum(widths), row - region.row, styles["frame"])
         return row - region.row
 
     def render_caption(self, component, context, engine, region):
@@ -33,33 +36,33 @@ class TableRenderer:
         """
         if not component.header:
             return 0
-        engine.sheet.write(region.row, region.column, component.header, Style(font_weight=700, font_size=18).merge(context.resolve_style(component)))
-        engine.sheet.merge(region.row, region.column, max(region.width, len(component.columns)))
+        engine.sheet.place(region.row, region.column, region.width, component.header, Style(font_weight=700, font_size=token("--rk-font-lg")).merge(context.resolve_style(component)))
         return 1
 
-    def render_header(self, component, engine, region, styles):
+    def render_header(self, component, engine, region, styles, widths):
         """
         Write the column titles and subtitles, repeated on printed pages when requested.
         """
         if not component.table_style.show_header:
             return 0
         style = styles["header"].merge(styles["ruled"]) if component.table_style.ruled else styles["header"]
-        for index, column in enumerate(component.columns):
-            engine.sheet.write(region.row, region.column + index, header_text(column, "\n"), style.merge(Style(text_align=column.header_align or column.align)))
+        for column, (start, width) in zip(component.columns, spans(region, widths)):
+            engine.sheet.place(region.row, start, width, header_text(column, "\n"), style.merge(Style(text_align=column.header_align or column.align)), padding=10)
         if component.table_style.repeat_header:
             engine.sheet.repeat_rows(region.row)
-        engine.sheet.set_row_height(region.row, 32 if any(column.subtitle for column in component.columns) else 18)
         return 1
 
-    def render_row(self, component, table_row, index, engine, region, styles, occupied):
+    def render_row(self, component, table_row, index, engine, region, styles, widths, occupied):
         """
-        Write one prepared row, merging cells that span columns or rows.
+        Write one prepared row, merging cells that span columns or rows, and return the single row it starts.
         """
-        row_style = self.get_row_style(component, table_row, index, styles)
-        for column, entry, colspan, rowspan in place_cells(get_entries(component, table_row), region.column, region.row, occupied):
+        row_style, starts = self.get_row_style(component, table_row, index, styles), spans(region, widths)
+        for column, entry, colspan, rowspan in place_cells(get_entries(component, table_row), 0, region.row, occupied):
+            if column + colspan > len(widths):
+                raise ExcelExportError(f"A table row has more cells than the table's {len(widths)} columns.")
             value, cell_style, cell_format = prepare_entry(entry, engine)
-            engine.sheet.write(region.row, column, value, row_style.merge(cell_style), cell_format)
-            engine.sheet.merge(region.row, column, colspan, rowspan)
+            engine.sheet.place(region.row, starts[column][0], sum(widths[column:column + colspan]), value, row_style.merge(cell_style), cell_format, height=rowspan, padding=10)
+        return 1
 
     @staticmethod
     def get_row_style(component, table_row, index, styles):
@@ -72,17 +75,16 @@ class TableRenderer:
             style = style.merge(styles["stripe"])
         if table_style.compact:
             style = style.merge(styles["compact"])
-        if table_style.ruled and table_row.kind == "total":
-            style = style.merge(styles["ruled"])
-        return style.merge(styles[table_row.kind]).merge(table_row.style)
+        kind = "ruled-total" if table_style.ruled and table_row.kind == "total" else table_row.kind
+        return style.merge(styles[kind]).merge(table_row.style)
 
     @staticmethod
-    def set_widths(component, engine, region):
+    def get_widths(component, engine, region):
         """
-        Size the table columns from their declared widths or titles.
+        Share the region between the columns: declared widths first, the rest by header length like the HTML auto layout.
         """
-        for index, column in enumerate(component.columns):
-            engine.sheet.set_column_width(region.column + index, width_characters(column))
+        tracks = [column.width or f"{max(len(column.title), len(column.subtitle or ''), MIN_COLUMN_CHARACTERS)}fr" for column in component.columns]
+        return distribute(track_shares(tracks, engine.sheet.content_pixels), region.width)
 
 
 class TableDataRenderer:
@@ -152,6 +154,13 @@ def prepare_entry(entry, engine):
     if content.children:
         return "\n".join(component_text(child) for child in content.children), cell_align.merge(content.style), None
     return engine.value(content.value), cell_align.merge(content.style), number_format(column)
+
+
+def spans(region, widths):
+    """
+    Return the first grid column and width of every table column.
+    """
+    return [(region.column + sum(widths[:index]), width) for index, width in enumerate(widths)]
 
 
 def header_text(column, separator):

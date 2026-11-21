@@ -62,6 +62,14 @@ def find(sheet, value):
     return next(cell for cell in cells(sheet) if cell.value == value)
 
 
+def merged_range(sheet, value):
+    """
+    Return the merged range that starts at the cell holding a value.
+    """
+    cell = find(sheet, value)
+    return next(merged for merged in sheet.merged_cells.ranges if merged.min_row == cell.row and merged.min_col == cell.column)
+
+
 def movements():
     """
     Return a prepared table with a prepared footer.
@@ -180,8 +188,10 @@ class TestTables:
         rows = [TableRow(cells=[TableCell(value="ممتد", colspan=2), TableCell(value="tall", rowspan=2)]), TableRow(cells=[TableCell(value="a"), TableCell(value="b")])]
         table = Table(columns=COLUMNS, rows=rows)
         sheet = export(report(table)).active
-        assert {str(merged) for merged in sheet.merged_cells.ranges} >= {"A2:B2", "C2:C3"}
-        assert sheet["A3"].value == "a" and sheet["B3"].value == "b"
+        wide, tall = merged_range(sheet, "ممتد"), merged_range(sheet, "tall")
+        assert (tall.min_row, tall.max_row) == (2, 3) and wide.max_row == 2
+        assert wide.max_col + 1 == tall.min_col
+        assert merged_range(sheet, "a").max_col < merged_range(sheet, "b").min_col < tall.min_col
         data = export(report(Table(columns=COLUMNS, rows=rows)), mode="data")["Table 1"]
         assert [cell.value for cell in data[2]] == ["ممتد", None, "tall"]
         assert [cell.value for cell in data[3]] == ["a", "b", None]

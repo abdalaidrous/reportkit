@@ -3,6 +3,7 @@ from ....components.typography import Heading, RichText, Text
 from ....styles.style import Style
 from ..styles import token
 from ..values import component_text
+from .base import track_shares
 
 INLINE = (Text, Heading, RichText, KeyValue)
 
@@ -22,68 +23,51 @@ class StackRenderer:
         return height
 
 
-class PageRenderer(StackRenderer):
-    """
-    Render a page and apply its print settings to the worksheet.
-    """
-
-    def render(self, component, context, engine, region):
-        """
-        Apply orientation, paper size and margins, then render the children.
-        """
-        engine.sheet.set_page(component)
-        return super().render(component, context, engine, region)
-
-
 class ColumnsRenderer:
     """
-    Render children side by side in bands of equal slots, like the HTML grid.
+    Render children side by side in bands of slots, like the HTML grid and flex rows.
     """
 
     def render(self, component, context, engine, region):
         """
         Render the children band by band and return the rows used.
         """
-        tracks, height = self.get_tracks(component), 0
-        for start in range(0, len(component.children), tracks):
-            height += self.render_band(component.children[start:start + tracks], context, engine, region.below(height), tracks)
+        shares, height = self.get_shares(component, engine), 0
+        for start in range(0, len(component.children), len(shares)):
+            slots = region.below(height).split(shares)
+            height += max(engine.render(child, context, slot) for child, slot in zip(component.children[start:start + len(shares)], slots))
         return height
 
-    def render_band(self, children, context, engine, region, tracks):
+    def get_shares(self, component, engine):
         """
-        Render one band of children and return the height of the tallest one.
+        Give every child of a row an equal share.
         """
-        return max(engine.render(child, context, slot) for child, slot in zip(children, region.split(tracks)))
-
-    def get_tracks(self, component):
-        """
-        Return the number of side-by-side slots.
-        """
-        return max(1, len(component.children))
+        return [1] * max(1, len(component.children))
 
 
 class GridRenderer(ColumnsRenderer):
     """
-    Render a Grid using its column track count.
+    Render a Grid with its column tracks (fr, auto, %, px).
     """
 
-    def get_tracks(self, component):
+    def get_shares(self, component, engine):
         """
-        Count the grid column tracks.
+        Convert the grid tracks into width shares.
         """
-        return component.columns if isinstance(component.columns, int) else len(component.columns.split())
+        tracks = ["1fr"] * component.columns if isinstance(component.columns, int) else component.columns.split()
+        return track_shares(tracks, engine.sheet.content_pixels)
 
 
 class InfoGridRenderer(ColumnsRenderer):
     """
-    Render an InfoGrid using its configured columns.
+    Render an InfoGrid with its configured number of equal columns.
     """
 
-    def get_tracks(self, component):
+    def get_shares(self, component, engine):
         """
-        Return the configured column count.
+        Give every column an equal share.
         """
-        return component.columns
+        return [1] * component.columns
 
 
 class SpacerRenderer:
@@ -110,9 +94,7 @@ class DividerRenderer:
         """
         Draw the rule on one row.
         """
-        style = Style(border_bottom=f"1px solid {token('--rk-color-border')}").merge(context.resolve_style(component))
-        for column in range(region.column, region.column + region.width):
-            engine.sheet.write(region.row, column, None, style)
+        engine.sheet.place(region.row, region.column, region.width, None, Style(border_bottom=f"1px solid {token('--rk-color-border')}").merge(context.resolve_style(component)))
         return 1
 
 

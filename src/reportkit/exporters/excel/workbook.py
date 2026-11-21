@@ -2,13 +2,14 @@ from io import BytesIO
 
 from openpyxl import Workbook
 
-from ...components.table import Table
+from ...components.document import Page
 from .exceptions import ExcelExportError
 from .exporter import INVALID_SHEET_NAME
 from .renderers import DATA_RENDERERS, FORMATTED_RENDERERS
 from .renderers.base import Region
 from .values import cell_value
-from .worksheet import DataSheet, FormattedSheet
+from .styles import pixels
+from .worksheet import GRID_COLUMNS, DataSheet, FormattedSheet, edge_borders
 
 
 class ExcelWorkbook:
@@ -67,28 +68,42 @@ class ExcelWorkbook:
 
 class FormattedEngine:
     """
-    Lay the report out on one sheet like the HTML/PDF output, with merged cells, styles and print settings.
+    Lay the report out on one page-wide sheet like the HTML/PDF output, with margins, outlines and print settings.
     """
 
     def __init__(self, workbook, context, document):
         """
-        Create the report sheet and measure its column grid from the tables.
+        Create the report sheet sized to the first page of the document.
         """
-        self.sheet, self.options = FormattedSheet(workbook.create_sheet(workbook.options.sheet_name), context.direction), workbook.options
-        self.width = max((len(table.columns) for table in find_tables(document)), default=6)
+        page = next(find_components(document, Page), None)
+        self.sheet, self.options = FormattedSheet(workbook.create_sheet(workbook.options.sheet_name), context.direction, page), workbook.options
 
     def write(self, document, context):
         """
-        Render the document from the top-left cell.
+        Render the document across the whole column grid.
         """
-        self.render(document, context, Region(1, 1, self.width))
+        self.render(document, context, Region(1, 1, GRID_COLUMNS))
         self.sheet.finish()
 
     def render(self, component, context, region):
         """
-        Render one component in a region and return the rows it used.
+        Render one component with its vertical margins, outline and background, and return the rows it used.
         """
-        return FORMATTED_RENDERERS.get(component).render(component, context, self, region)
+        style = context.resolve_style(component)
+        top = self.add_gap(region.row, style.margin_top)
+        height = FORMATTED_RENDERERS.get(component).render(component, context, self, region.below(top))
+        if height and (style.background_color or edge_borders(style) != [None] * 4):
+            self.sheet.outline(region.row + top, region.column, region.width, height, style)
+        return top + height + self.add_gap(region.row + top + height, style.margin_bottom)
+
+    def add_gap(self, row, margin):
+        """
+        Turn a vertical CSS margin into an empty row of the same height.
+        """
+        if not margin or pixels(margin) < 4:
+            return 0
+        self.sheet.set_row_height(row, pixels(margin) * 0.75)
+        return 1
 
     def value(self, value):
         """
@@ -142,11 +157,11 @@ class DataEngine:
         return cell_value(value, self.options.decimal_policy)
 
 
-def find_tables(component):
+def find_components(component, kind):
     """
-    Yield the tables of the component tree without touching their rows.
+    Yield the components of one type in the tree without touching table rows.
     """
-    if isinstance(component, Table):
+    if isinstance(component, kind):
         yield component
     for child in getattr(component, "children", []):
-        yield from find_tables(child)
+        yield from find_components(child, kind)

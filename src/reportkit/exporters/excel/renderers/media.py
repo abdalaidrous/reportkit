@@ -19,7 +19,7 @@ class ImageRenderer:
         """
         Place the image and return the rows it covers.
         """
-        height = engine.sheet.add_image(self.get_data(component), region.row, region.column, pixels(component.width), pixels(component.height))
+        height = engine.sheet.add_image(self.get_data(component), region.row, region.column, region.width, pixels(component.width), pixels(component.height))
         return max(1, math.ceil(height / ROW_HEIGHT_PIXELS))
 
     @staticmethod

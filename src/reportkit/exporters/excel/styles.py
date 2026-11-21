@@ -9,6 +9,7 @@ from ..html.templates import HtmlTemplateEngine
 from .exceptions import ExcelExportError
 
 TOKEN_PATTERN = re.compile(r"(--rk-[\w-]+)\s*:\s*([^;]+);")
+DEFAULT_FONT = "Arial"
 VERTICAL = {"top": "top", "middle": "center", "bottom": "bottom"}
 
 
@@ -66,8 +67,8 @@ def get_font(style):
     """
     Build the font from the typography properties.
     """
-    family = style.font_family.split(",")[0].strip(" '\"") if style.font_family else None
-    size = points(style.font_size) if style.font_size else None
+    family = (style.font_family or DEFAULT_FONT).split(",")[0].strip(" '\"")
+    size = points(style.font_size or token("--rk-font-md"))
     return Font(name=family, size=size, bold=is_bold(style.font_weight), italic=style.font_style == "italic", color=get_color(style.color))
 
 
@@ -82,7 +83,8 @@ def get_alignment(style, direction):
     """
     Build the alignment, resolving start/end against the sheet direction.
     """
-    return Alignment(horizontal=get_horizontal(style.text_align, direction), vertical=VERTICAL.get(style.vertical_align, "center"), wrap_text=True)
+    horizontal = get_horizontal(style.text_align, direction)
+    return Alignment(horizontal=horizontal, vertical=VERTICAL.get(style.vertical_align, "center"), wrap_text=True, indent=1 if horizontal in ("left", "right") else 0)
 
 
 def get_horizontal(align, direction):
@@ -109,6 +111,8 @@ def get_side(value):
     if not value:
         return Side()
     width, line, color = (value.split() + ["", "", ""])[:3]
+    if line == "none":
+        return Side()
     weight = float(re.sub(r"[^\d.]", "", width) or 1)
     kind = "dashed" if line == "dashed" else "dotted" if line == "dotted" else "double" if line == "double" else "thick" if weight >= 3 else "medium" if weight >= 2 else "thin"
     return Side(style=kind, color=get_color(color) if color else None)
@@ -127,12 +131,19 @@ def get_color(color):
     return "FF" + digits.upper()
 
 
-def points(size):
+def pixels(size):
     """
-    Convert a CSS font size (number of px, "12px" or "9pt") into Excel points.
+    Convert a CSS size (number of px, "12px" or "9pt") into pixels.
     """
     text = str(size)
-    return round(float(re.sub(r"[^\d.]", "", text)) * (1 if text.endswith("pt") else 0.75), 1)
+    return float(re.sub(r"[^\d.]", "", text)) * (4 / 3 if text.endswith("pt") else 1)
+
+
+def points(size):
+    """
+    Convert a CSS size into Excel points.
+    """
+    return round(pixels(size) * 0.75, 1)
 
 
 def is_bold(weight):
@@ -142,20 +153,22 @@ def is_bold(weight):
     return weight == "bold" or (str(weight).isdigit() and int(weight) >= 600)
 
 
-def table_styles():
+def table_styles(base=Style()):
     """
-    Build the table styles from the shared table tokens.
+    Build the table styles from the shared table tokens, on top of the table component style.
     """
-    divider, frame = f"1px solid {token('--rk-table-divider-color')}", f"1px solid {token('--rk-table-frame-color')}"
+    divider, frame, ruled = f"1px solid {token('--rk-table-divider-color')}", f"1px solid {token('--rk-table-frame-color')}", token("--rk-table-ruled-color")
     return {
-        "cell": Style(color=token("--rk-table-cell-color"), border_bottom=divider),
+        "cell": base.merge(Style(color=token("--rk-table-cell-color"), border_bottom=divider)),
         "bordered": Style(border_left=divider, border_right=divider, border_top=divider, border_bottom=divider),
-        "header": Style(background_color=token("--rk-table-header-bg"), color=token("--rk-table-header-color"), font_weight=700, border_top=f"1px solid {token('--rk-table-header-accent')}", border_bottom=f"2px solid {token('--rk-table-header-rule')}", border_left=frame, border_right=frame),
-        "ruled": Style(border_top=f"1px solid {token('--rk-table-ruled-color')}", border_bottom=f"2px solid {token('--rk-table-ruled-color')}"),
+        "header": base.merge(Style(background_color=token("--rk-table-header-bg"), color=token("--rk-table-header-color"), font_weight=700, border_top=f"1px solid {token('--rk-table-header-accent')}", border_bottom=f"2px solid {token('--rk-table-header-rule')}")),
+        "ruled": Style(border_top=f"1px solid {ruled}", border_bottom=f"2px solid {ruled}"),
+        "frame": Style(border_left=frame, border_right=frame, border_top=frame, border_bottom=frame),
         "stripe": Style(background_color=token("--rk-table-stripe-bg")),
         "total": Style(background_color=token("--rk-table-total-bg"), font_weight=700, border_top=f"2px solid {token('--rk-table-divider-color')}"),
+        "ruled-total": Style(font_weight=700, color=token("--rk-table-header-color"), border_top=f"2px solid {ruled}", border_bottom="0px none #ffffff"),
         "subtotal": Style(background_color=token("--rk-table-subtotal-bg"), font_weight=600),
         "group-header": Style(background_color=token("--rk-table-group-bg"), font_weight=700),
         "data": Style(),
-        "compact": Style(font_size=float(token("--rk-font-xs").removesuffix("px"))),
+        "compact": Style(font_size=token("--rk-font-xs")),
     }
