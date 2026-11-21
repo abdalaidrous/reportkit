@@ -12,16 +12,12 @@ ReportKit مكتبة Python مستقلة لبناء التقارير من مكو
 
 ```powershell
 pip install -e .
-python -m examples.financial_movement.report
+python -m examples.financial_movement.simple     # 1: عنوان + جدول بإجمالي + أرقام الصفحات
+python -m examples.financial_movement.branded    # 2: التصميم الكامل (reference_preview.html)، و --pdf
+python -m examples.financial_movement.formats    # 3: TableBuilder وصفوف generator وترويسة متكررة وكل الصيغ
 ```
 
-ينتج الملف:
-
-```text
-examples/financial_movement/reportkit_output.html
-```
-
-يبني المثال تقريرًا يحتوي على ترويسة فندق ثنائية اللغة، شعار، بيانات تعريفية، فلاتر، جدول حركات، وجدول ملخص. يتم تمرير الصفوف والإجماليات جاهزة، ولا تحسب ReportKit أي إجماليات أو مجاميع.
+المخرجات في `examples/financial_movement/output/`، والشرح في `examples/README.md`. الأمثلة الثلاثة مبنية بـ `ReportBuilder` وببيانات صغيرة، وتشترك في `data.py` و`styles.py` و`blocks.py` (مكونات ثنائية اللغة: `hotel_identity`, `brand_line`, `report_title`, `section_title`, `labeled_grid`). يتم تمرير الصفوف والإجماليات جاهزة، ولا تحسب ReportKit أي إجماليات أو مجاميع.
 
 مثال مبسط:
 
@@ -95,14 +91,17 @@ reportkit/
 ├── README.md
 ├── examples/
 │   ├── __init__.py
+│   ├── README.md                # شرح الأمثلة الثلاثة
 │   └── financial_movement/
-│       ├── __init__.py
-│       ├── data.py              # بيانات المثال الجاهزة
-│       ├── logo.png             # أصل الشعار المحلي
-│       ├── report.py            # بناء وتشغيل التقرير
-│       ├── styles.py            # Styles الخاصة بالمثال
-│       ├── README.md
-│       └── reportkit_output.html
+│       ├── data.py              # بيانات صغيرة جاهزة
+│       ├── styles.py            # Styles الخاصة بالأمثلة
+│       ├── blocks.py            # مكونات ثنائية اللغة مركبة
+│       ├── simple.py            # مثال 1
+│       ├── branded.py           # مثال 2 (يستخدمه اختبارات المصدّرين)
+│       ├── formats.py           # مثال 3
+│       ├── logo.png
+│       ├── reference_preview.html  # التصميم المستهدف لـ branded.py
+│       └── output/              # المخرجات المولدة
 ├── src/reportkit/
 │   ├── __init__.py
 │   ├── report.py
@@ -223,7 +222,7 @@ with open("report.pdf", "wb") as file:              # الحفظ مسؤولية 
 ```powershell
 docker build -t reportkit-pdf .
 docker run --rm reportkit-pdf
-docker run --rm -v "${PWD}/examples:/app/examples" reportkit-pdf python -m examples.financial_movement.report --pdf
+docker run --rm -v "${PWD}/examples:/app/examples" reportkit-pdf python -m examples.financial_movement.branded --pdf
 ```
 
 ## تصدير Excel
@@ -262,7 +261,7 @@ WordExporter().export_to(document, "report.docx", context)   # مسار أو str
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests -t .
-.\.venv\Scripts\python.exe -m examples.financial_movement.report
+.\.venv\Scripts\python.exe -m examples.financial_movement.branded
 .\.venv\Scripts\python.exe -m compileall -q src examples tests
 ```
 

@@ -186,7 +186,7 @@ def test_missing_python_docx_has_clear_message():
 
 
 def test_financial_example():
-    from examples.financial_movement.report import build_report
+    from examples.financial_movement.branded import report_builder
 
-    document = export(build_report())
+    document = export(report_builder().build())
     assert len(document.tables) > 3 and len(document.inline_shapes) == 1

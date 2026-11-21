@@ -1,14 +1,16 @@
 import io
 import unittest
 
-from examples.financial_movement.data import FILTERS, METADATA, MOVEMENT_COLUMNS, MOVEMENTS, SUMMARY_COLUMNS, SUMMARY_ROWS, SUMMARY_TOTAL
-from examples.financial_movement.report import build_header, build_report, build_table, filters_grid, report_title, section_title
-from examples.financial_movement.styles import TABLE
+from examples.financial_movement.blocks import hotel_identity, labeled_grid, report_title, section_title
+from examples.financial_movement.branded import report_builder
+from examples.financial_movement.data import BRANDING, FILTERS, METADATA, MOVEMENT_COLUMNS, MOVEMENTS, SUMMARY_COLUMNS, SUMMARY_ROWS, SUMMARY_TOTAL
+from examples.financial_movement.styles import MOVEMENTS_TABLE, SUMMARY_TABLE, TABLE
 from reportkit.builders import ReportBuilder, TableBuilder
 from reportkit.builders.report import expand_margin
-from reportkit.components.document import Footer, Header
+from reportkit.components.document import Footer, Header, Page, Report
+from reportkit.components.layout import Spacer
 from reportkit.components.pagination import PageNumber
-from reportkit.components.table import TableColumn, TableRow, TableStyle
+from reportkit.components.table import Table, TableColumn, TableRow, TableStyle
 from reportkit.components.typography import Text
 from reportkit.exporters.html.exporter import HtmlExporter
 from reportkit.rendering.context import RenderingContext
@@ -25,26 +27,26 @@ def html(report):
     return HtmlExporter().export(report, CONTEXT).decode("utf-8")
 
 
-def financial_movement_report():
+def direct_report():
     """
-    Rebuild the financial movement example through ReportBuilder, calling the footer early on purpose.
+    Build the branded example tree directly from components, without the builder.
     """
-    movements = build_table(MOVEMENT_COLUMNS, MOVEMENTS)
-    summary = build_table(SUMMARY_COLUMNS, SUMMARY_ROWS, SUMMARY_TOTAL, first_align="right", ruled=True)
-    return (
-        ReportBuilder("Financial Movement Report")
-        .page(size="A4", orientation="portrait", margin="10mm 11mm 12mm", page_number_position="bottom-center")
-        .footer(filters_grid(METADATA, framed=True))
-        .header(*build_header().children)
-        .add(report_title("Financial Movement Report", "تقرير الحركة المالية"), filters_grid(FILTERS))
-        .table(movements.columns, MOVEMENTS, style=TABLE, table_style=movements.table_style)
-        .spacer(20)
-        .add(section_title("Summary by Payment Method", "الملخص حسب طريقة الدفع"))
-        .table(summary.columns, SUMMARY_ROWS, totals=SUMMARY_TOTAL, style=TABLE, table_style=summary.table_style)
-        .spacer(20)
-        .page_number("Page {page} of {pages}")
-        .build()
-    )
+    return Report(title="Financial Movement Report", children=[Page(
+        size="A4", orientation="portrait", margin_top="10mm", margin_right="11mm", margin_bottom="12mm", margin_left="11mm",
+        page_number_position="bottom-center",
+        children=[
+            Header(children=[hotel_identity(BRANDING)]),
+            report_title("Financial Movement Report", "تقرير الحركة المالية"),
+            labeled_grid(FILTERS),
+            Table(columns=MOVEMENT_COLUMNS, rows=[TableRow(values=row) for row in MOVEMENTS], style=TABLE, table_style=MOVEMENTS_TABLE),
+            Spacer(height=20),
+            section_title("Summary by Payment Method", "الملخص حسب طريقة الدفع"),
+            Table(columns=SUMMARY_COLUMNS, rows=[TableRow(values=row) for row in SUMMARY_ROWS], footer=TableRow(values=SUMMARY_TOTAL, kind="total"), style=TABLE, table_style=SUMMARY_TABLE),
+            Spacer(height=20),
+            Footer(children=[labeled_grid(METADATA, framed=True)]),
+            PageNumber(format="Page {page} of {pages}"),
+        ],
+    )])
 
 
 class ReportBuilderTests(unittest.TestCase):
@@ -53,7 +55,7 @@ class ReportBuilderTests(unittest.TestCase):
     """
 
     def test_matches_direct_construction(self):
-        self.assertEqual(html(financial_movement_report()), html(build_report()))
+        self.assertEqual(html(report_builder().build()), html(direct_report()))
 
     def test_repeated_footer_precedes_content(self):
         content = Text(value="body")

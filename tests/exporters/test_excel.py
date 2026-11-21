@@ -293,7 +293,7 @@ class TestLayout:
             svg.unlink()
 
     def test_financial_example_in_both_modes(self):
-        from examples.financial_movement.report import build_report
+        from examples.financial_movement.branded import report_builder
 
-        assert export(build_report()).active.max_row > 10
-        assert len(export(build_report(), mode="data", streaming=True).sheetnames) == 3
+        assert export(report_builder().build()).active.max_row > 10
+        assert len(export(report_builder().build(), mode="data", streaming=True).sheetnames) == 3

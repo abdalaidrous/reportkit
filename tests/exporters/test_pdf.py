@@ -178,9 +178,9 @@ class PdfExporterTests(unittest.TestCase):
         self.assertTrue(pdf.startswith(b"%PDF"))
 
     def test_financial_example(self):
-        from examples.financial_movement.report import build_report
+        from examples.financial_movement.branded import report_builder
 
-        pdf = PdfExporter.export(build_report(), RenderingContext(language="ar", direction="rtl"))
+        pdf = PdfExporter.export(report_builder().build(), RenderingContext(language="ar", direction="rtl"))
         self.assertTrue(pdf.startswith(b"%PDF"))
 
     def test_arabic_and_english_text(self):
@@ -247,10 +247,10 @@ class PdfExporterTests(unittest.TestCase):
         self.assertIn("VAT No", texts)
 
     def test_long_financial_report_with_composite_cells(self):
-        from examples.financial_movement import report as example
+        from examples.financial_movement import branded as example
 
-        with mock.patch.object(example, "MOVEMENTS", example.MOVEMENTS * 12):
-            document = example.build_report()
+        with mock.patch.object(example, "MOVEMENTS", example.MOVEMENTS * 20):
+            document = example.report_builder().build()
         html = HtmlExporter().export(document, RenderingContext(language="ar", direction="rtl")).decode("utf-8")
         pages = PdfConversionService.render(html).pages
         self.assertGreater(len(pages), 1)

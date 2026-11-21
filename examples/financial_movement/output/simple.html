@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Financial Movement Report</title>
+
+    <style>
+        :root {
+    /* Typography */
+    --rk-font-family: "Inter", "Noto Sans Arabic", Arial, sans-serif;
+    --rk-font-xs: 11px;
+    --rk-font-sm: 13px;
+    --rk-font-md: 14px;
+    --rk-font-lg: 18px;
+    --rk-font-xl: 24px;
+    --rk-font-2xl: 30px;
+
+    /* Base colors */
+    --rk-color-primary: #2563eb;
+    --rk-color-text: #172033;
+    --rk-color-muted: #64748b;
+    --rk-color-border: #e2e8f0;
+    --rk-color-surface: #ffffff;
+    --rk-color-subtle: #f8fafc;
+    --rk-color-positive: #059669;
+    --rk-color-negative: #dc2626;
+
+    /* Neutral scale used by tables */
+    --rk-gray-50: #f8f8f8;
+    --rk-gray-100: #f0f0f0;
+    --rk-gray-200: #e2e2e2;
+    --rk-gray-300: #dddddd;
+    --rk-gray-500: #8d8d8d;
+    --rk-gray-600: #555555;
+    --rk-gray-700: #444444;
+    --rk-gray-800: #333333;
+    --rk-gray-900: #262626;
+    --rk-accent: #53789d;
+
+    /* Spacing */
+    --rk-space-1: 4px;
+    --rk-space-2: 8px;
+    --rk-space-3: 12px;
+    --rk-space-4: 16px;
+    --rk-space-5: 24px;
+    --rk-space-6: 32px;
+    --rk-space-7: 48px;
+
+    /* Radius */
+    --rk-radius-sm: 6px;
+    --rk-radius-md: 10px;
+    --rk-radius-lg: 16px;
+
+    /* Tables */
+    --rk-table-radius: 0;
+    --rk-table-frame-color: var(--rk-gray-300);
+    --rk-table-divider-color: var(--rk-gray-200);
+    --rk-table-header-bg: var(--rk-gray-100);
+    --rk-table-header-color: var(--rk-gray-900);
+    --rk-table-header-accent: var(--rk-accent);
+    --rk-table-header-rule: var(--rk-gray-800);
+    --rk-table-subtitle-color: var(--rk-gray-500);
+    --rk-table-cell-color: var(--rk-gray-700);
+    --rk-table-stripe-bg: var(--rk-gray-50);
+    --rk-table-hover-bg: var(--rk-gray-100);
+    --rk-table-group-bg: var(--rk-gray-200);
+    --rk-table-subtotal-bg: var(--rk-gray-100);
+    --rk-table-total-bg: var(--rk-gray-200);
+    --rk-table-ruled-color: var(--rk-gray-600);
+    --rk-table-cell-padding-y: 8px;
+    --rk-table-cell-padding-x: 10px;
+    --rk-table-compact-padding-y: 5px;
+    --rk-table-compact-padding-x: 8px;
+    --rk-table-caption-padding: var(--rk-space-4);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    background: #f1f5f9;
+}
+
+body {
+    margin: 0;
+    color: var(--rk-color-text);
+    font-family: var(--rk-font-family);
+    font-size: var(--rk-font-md);
+    line-height: 1.7;
+}
+
+.rk-report {
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 0;
+    background: var(--rk-color-surface);
+    border: 1px solid var(--rk-color-border);
+    border-radius: var(--rk-radius-lg);
+}
+
+.rk-page {
+    min-width: 0;
+}
+
+.rk-divider {
+    height: 1px;
+    margin: var(--rk-space-5) 0;
+    border: 0;
+    background: var(--rk-color-border);
+}
+
+[dir="rtl"] {
+    text-align: right;
+}
+
+[dir="ltr"] {
+    text-align: left;
+}
+
+.rk-text {
+    margin: 0 0 var(--rk-space-3);
+    color: var(--rk-color-text);
+    font-size: var(--rk-font-md);
+    line-height: 1.8;
+}
+
+.rk-heading {
+    margin: 0 0 var(--rk-space-4);
+    color: var(--rk-color-text);
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.rk-heading--1 {
+    font-size: var(--rk-font-2xl);
+    letter-spacing: -0.5px;
+}
+
+.rk-heading--2 {
+    font-size: var(--rk-font-xl);
+}
+
+.rk-heading--3 {
+    font-size: var(--rk-font-lg);
+}
+
+.rk-muted {
+    color: var(--rk-color-muted);
+}
+
+.rk-label {
+    font-size: var(--rk-font-xs);
+    font-weight: 600;
+    color: var(--rk-color-muted);
+}
+
+.rk-rich-text {
+    margin: 0;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.rk-rich-text span {
+    unicode-bidi: isolate;
+}
+
+.rk-rich-text span[dir="rtl"] {
+    direction: rtl;
+}
+
+.rk-rich-text span[dir="ltr"] {
+    direction: ltr;
+}
+
+
+.rk-section {
+    margin-bottom: var(--rk-space-6);
+}
+
+.rk-box {
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+.rk-box > *:first-child {
+    margin-top: 0;
+}
+
+.rk-box > *:last-child {
+    margin-bottom: 0;
+}
+
+.rk-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--rk-space-4);
+    min-width: 0;
+}
+
+.rk-row > * {
+    min-width: 0;
+}
+
+.rk-column {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--rk-space-4);
+    min-width: 0;
+}
+
+.rk-column > * {
+    min-width: 0;
+}
+
+.rk-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--rk-space-4);
+    width: 100%;
+    min-width: 0;
+}
+
+.rk-grid > * {
+    min-width: 0;
+}
+
+.rk-spacer {
+    display: block;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.rk-divider {
+    display: block;
+    width: 100%;
+    height: 0;
+    margin: var(--rk-space-4) 0;
+    border: 0;
+    border-top: 1px solid var(--rk-color-border);
+}
+
+.rk-card {
+    padding: var(--rk-space-5);
+    background: var(--rk-color-surface);
+    border: 1px solid var(--rk-color-border);
+    border-radius: var(--rk-radius-md);
+}
+
+.rk-surface {
+    padding: var(--rk-space-4);
+    background: var(--rk-color-subtle);
+    border-radius: var(--rk-radius-md);
+}
+
+/* Container: wide tables scroll inside their frame on screen instead of widening the page. */
+.rk-table-container {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--rk-table-frame-color);
+    border-radius: var(--rk-table-radius);
+}
+
+.rk-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: var(--rk-font-sm);
+    text-align: start;
+}
+
+.rk-table--layout-auto {
+    table-layout: auto;
+}
+
+.rk-table-caption {
+    padding: var(--rk-table-caption-padding);
+    font-size: var(--rk-font-lg);
+    font-weight: 700;
+    text-align: start;
+    caption-side: top;
+}
+
+/* Cells wrap at word boundaries and break a word only when it cannot fit at all. */
+.rk-table th,
+.rk-table td {
+    padding: var(--rk-table-cell-padding-y) var(--rk-table-cell-padding-x);
+    vertical-align: middle;
+    border-bottom: 1px solid var(--rk-table-divider-color);
+    color: var(--rk-table-cell-color);
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+}
+
+.rk-table thead th {
+    background: var(--rk-table-header-bg);
+    color: var(--rk-table-header-color);
+    font-weight: 800;
+    border-top: 1px solid var(--rk-table-header-accent);
+    border-bottom: 2px solid var(--rk-table-header-rule);
+}
+
+.rk-table-th__title,
+.rk-table-th__subtitle {
+    display: block;
+}
+
+.rk-table-th__title {
+    white-space: pre-line;
+}
+
+.rk-table-th__subtitle {
+    margin-top: 2px;
+    color: var(--rk-table-subtitle-color);
+    font-size: 0.85em;
+    font-weight: 400;
+}
+
+/* Each line of a plain value is its own block with a resolved dir, so "12:47 AM" stays LTR in RTL tables. */
+.rk-table-cell__line {
+    display: block;
+}
+
+/* The resolved dir only orders the text; alignment still comes from the cell (base.css aligns every [dir]). */
+.rk-table-cell__line,
+.rk-table-th__title,
+.rk-table-th__subtitle {
+    text-align: inherit;
+}
+
+/* Custom cells only lay out their children; the children keep their own styles. */
+.rk-table-cell__content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.rk-table-cell__content > * {
+    margin: 0;
+}
+
+/* No wrapping: auto layout widens the column, fixed layout clips with an ellipsis. */
+.rk-table-th--nowrap .rk-table-th__title,
+.rk-table-th--nowrap .rk-table-th__subtitle,
+.rk-table--layout-auto .rk-table-th__title,
+.rk-table--layout-auto .rk-table-th__subtitle,
+.rk-table-cell--nowrap,
+.rk-table-cell--nowrap .rk-table-cell__line {
+    white-space: nowrap;
+}
+
+.rk-table--layout-fixed .rk-table-cell--nowrap {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rk-table-cell--positive {
+    color: var(--rk-color-positive);
+}
+
+.rk-table-cell--negative {
+    color: var(--rk-color-negative);
+}
+
+.rk-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+/* Options */
+.rk-table--bordered th,
+.rk-table--bordered td {
+    border: 1px solid var(--rk-table-divider-color);
+}
+
+.rk-table--striped tbody .rk-table-data:nth-child(even) {
+    background: var(--rk-table-stripe-bg);
+}
+
+.rk-table--hover tbody tr:hover {
+    background: var(--rk-table-hover-bg);
+}
+
+.rk-table--compact th,
+.rk-table--compact td {
+    padding: var(--rk-table-compact-padding-y) var(--rk-table-compact-padding-x);
+    font-size: var(--rk-font-xs);
+}
+
+/* Row kinds */
+.rk-table-group-header {
+    background: var(--rk-table-group-bg);
+    font-weight: 700;
+}
+
+.rk-table-subtotal {
+    background: var(--rk-table-subtotal-bg);
+    font-weight: 600;
+}
+
+.rk-table-subtotal td {
+    border-top: 1px solid var(--rk-table-divider-color);
+}
+
+.rk-table-total {
+    background: var(--rk-table-total-bg);
+    font-weight: 700;
+}
+
+.rk-table-total td {
+    border-top: 2px solid var(--rk-table-divider-color);
+    border-bottom: 0;
+}
+
+/* Ruled: no frame or vertical lines; heavy rules around the header and above the total. */
+.rk-table-container--ruled {
+    border: 0;
+    border-radius: 0;
+}
+
+.rk-table--ruled th,
+.rk-table--ruled td {
+    border-left: 0;
+    border-right: 0;
+}
+
+.rk-table--ruled thead th {
+    border-top: 1px solid var(--rk-table-ruled-color);
+    border-bottom: 2px solid var(--rk-table-ruled-color);
+}
+
+.rk-table--ruled .rk-table-total {
+    background: transparent;
+}
+
+.rk-table--ruled .rk-table-total td {
+    border-top: 2px solid var(--rk-table-ruled-color);
+    color: var(--rk-table-header-color);
+}
+
+/* Print follows the table options: the header repeats and rows stay whole only when asked. */
+@media print {
+    /* Close the frame on every page instead of leaving it open down to the page edge. */
+    .rk-table-container {
+        overflow: visible;
+        border: 0;
+    }
+
+    .rk-table-container:not(.rk-table-container--ruled) > .rk-table {
+        border: 1px solid var(--rk-table-frame-color);
+    }
+
+    .rk-table thead,
+    .rk-table tfoot {
+        display: table-row-group;
+    }
+
+    .rk-table--repeat-header thead {
+        display: table-header-group;
+    }
+
+    .rk-table--avoid-row-break tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .rk-table-caption,
+    .rk-table-group-header {
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+
+    .rk-table--hover tbody tr:hover {
+        background: transparent;
+    }
+}
+
+.rk-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.rk-image--logo {
+    max-height: 90px;
+}
+
+
+.rk-key-value {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--rk-color-border);
+}
+
+.rk-key-value--vertical {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 4px;
+}
+
+.rk-key-value__labels {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    flex-wrap: wrap;
+}
+
+.rk-key-value--vertical .rk-key-value__labels {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3px;
+}
+
+.rk-key-value__label {
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--rk-color-muted);
+}
+
+.rk-key-value__secondary {
+    font-size: 10px;
+    line-height: 1.4;
+    color: var(--rk-color-muted);
+    opacity: 0.85;
+}
+
+.rk-key-value__value {
+    min-width: 0;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
+}
+
+.rk-info-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--rk-info-columns), minmax(0, 1fr));
+    gap: var(--rk-info-gap);
+    width: 100%;
+    min-width: 0;
+}
+
+.rk-info-grid > * {
+    min-width: 0;
+}
+
+@media (max-width: 640px) {
+    .rk-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media print {
+    .rk-key-value {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .rk-info-grid {
+        break-inside: auto;
+    }
+}
+
+@page {
+    size: A4;
+    margin: 15mm;
+}
+
+.rk-page {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    max-width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    padding: 10mm;
+    background: #ffffff;
+}
+
+.rk-page[data-page-orientation="landscape"] {
+    max-width: 297mm;
+    min-height: 210mm;
+}
+
+.rk-page-break {
+    display: none;
+}
+
+.rk-header {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.rk-footer {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media print {
+    html,
+    body {
+        background: #ffffff;
+    }
+
+    .rk-report {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        border: none;
+        border-radius: 0;
+    }
+
+    .rk-card {
+        break-inside: avoid;
+    }
+
+    .rk-page-break {
+        break-after: page;
+    }
+
+    .rk-no-print {
+        display: none !important;
+    }
+
+    .rk-page {
+        max-width: none;
+        min-height: 0;
+        padding: 0;
+        break-after: page;
+        page-break-after: always;
+    }
+
+    .rk-page:last-child {
+        break-after: auto;
+        page-break-after: auto;
+    }
+
+    .rk-page-break {
+        display: block;
+        break-before: page;
+        page-break-before: always;
+    }
+
+    .rk-page-number {
+        font-size: 11px;
+        color: #64748b;
+    }
+
+    .rk-header,
+    .rk-footer {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
+
+@page {
+    size: A4 portrait;
+    margin: 15mm 15mm 15mm 15mm;
+@bottom-right { content: "صفحة " counter(page) " من " counter(pages); font-family: Arial, 'Noto Sans Arabic', Tahoma, sans-serif; font-size: 8pt; color: #555555; }
+}
+    </style>
+</head>
+
+<body>
+    <main class="rk-report">
+    <section
+    class="rk-page"
+    data-page-size="A4"
+    data-page-orientation="portrait"
+    
+>
+    <h2 class="rk-heading rk-heading--2">تقرير الحركة المالية</h2><div class="rk-table-container">
+    <table class="rk-table rk-table--layout-fixed rk-table--bordered rk-table--repeat-header rk-table--avoid-row-break">
+        
+        <colgroup>
+            <col><col><col><col><col><col>
+        </colgroup>
+        
+        <thead>
+            <tr>
+                
+                <th scope="col" class="rk-table-th rk-table-th--nowrap" style="text-align: center">
+                    <span class="rk-table-th__title" dir="rtl">رقم السند</span><span class="rk-table-th__subtitle" dir="ltr">Voucher No.</span>
+                </th>
+                
+                <th scope="col" class="rk-table-th rk-table-th--nowrap" style="text-align: center">
+                    <span class="rk-table-th__title" dir="rtl">التاريخ والوقت</span><span class="rk-table-th__subtitle" dir="ltr">Date &amp; Time</span>
+                </th>
+                
+                <th scope="col" class="rk-table-th" style="text-align: center">
+                    <span class="rk-table-th__title" dir="rtl">البيان</span><span class="rk-table-th__subtitle" dir="ltr">Description</span>
+                </th>
+                
+                <th scope="col" class="rk-table-th" style="text-align: center">
+                    <span class="rk-table-th__title" dir="rtl">طريقة الدفع</span><span class="rk-table-th__subtitle" dir="ltr">Payment Method</span>
+                </th>
+                
+                <th scope="col" class="rk-table-th rk-table-th--nowrap" style="text-align: center">
+                    <span class="rk-table-th__title" dir="rtl">المبلغ</span><span class="rk-table-th__subtitle" dir="ltr">Amount</span>
+                </th>
+                
+                <th scope="col" class="rk-table-th rk-table-th--nowrap" style="text-align: center">
+                    <span class="rk-table-th__title" dir="rtl">المستخدم</span><span class="rk-table-th__subtitle" dir="ltr">User</span>
+                </th>
+                
+            </tr>
+        </thead>
+        
+        <tbody>
+            
+            <tr class="rk-table-row rk-table-data">
+                <td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line">000003</span></span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><div class="rk-table-cell__content"><p class="rk-text" style="font-size: 10.5px; color: #444444">14/11/2026</p><p class="rk-text" style="font-size: 9px; color: #777777; direction: ltr">12:47 AM</p></div></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line" dir="rtl">دفعة الحجز رقم 1</span></span></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line" dir="rtl">الدفع نقدًا</span></span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line" dir="rtl">200.00 ﷼</span></span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line" dir="rtl">عبدالله العيدروس</span></span></td>
+            </tr>
+            
+            <tr class="rk-table-row rk-table-data">
+                <td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line">000002</span></span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><div class="rk-table-cell__content"><p class="rk-text" style="font-size: 10.5px; color: #444444">13/11/2026</p><p class="rk-text" style="font-size: 9px; color: #777777; direction: ltr">11:55 PM</p></div></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line" dir="rtl">دفعة الحجز رقم 1</span></span></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line" dir="rtl">الدفع نقدًا</span></span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line" dir="rtl">100.00 ﷼</span></span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line" dir="rtl">عبدالله العيدروس</span></span></td>
+            </tr>
+            
+            <tr class="rk-table-row rk-table-data">
+                <td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line">000001</span></span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><div class="rk-table-cell__content"><p class="rk-text" style="font-size: 10.5px; color: #444444">13/11/2026</p><p class="rk-text" style="font-size: 9px; color: #777777; direction: ltr">11:39 PM</p></div></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line" dir="rtl">دفعة الحجز رقم 1</span></span></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line" dir="rtl">تمارا</span></span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line" dir="rtl">100.00 ﷼</span></span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line" dir="rtl">عبدالله العيدروس</span></span></td>
+            </tr>
+            
+        </tbody>
+        
+        <tfoot>
+            <tr class="rk-table-row rk-table-total">
+                <td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line" dir="rtl">الإجمالي</span></span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line"></span></span></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line"></span></span></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line"></span></span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line" dir="rtl">400.00 ﷼</span></span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value"><span class="rk-table-cell__line"></span></span></td>
+            </tr>
+        </tfoot>
+        
+    </table>
+</div>
+</section>
+</main>
+</body>
+</html>

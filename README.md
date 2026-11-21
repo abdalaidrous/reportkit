@@ -23,7 +23,90 @@ the provided `Dockerfile`.
 
 Requires Python 3.10 or newer.
 
-## Quick start
+## Quick start: ReportBuilder
+
+`ReportBuilder` is the recommended way to build a report. Chain the parts top to bottom, then `build()` the `Report` or
+export it directly:
+
+```python
+from reportkit.builders import ReportBuilder
+from reportkit.components.table import TableColumn
+from reportkit.components.typography import Heading
+from reportkit.rendering.context import RenderingContext
+
+columns = [
+    TableColumn(key="voucher", title="رقم السند", subtitle="Voucher No."),
+    TableColumn(key="method", title="طريقة الدفع", subtitle="Payment Method"),
+    TableColumn(key="amount", title="المبلغ", subtitle="Amount", format="currency", currency="﷼"),
+]
+rows = [
+    {"voucher": "000002", "method": "الدفع نقدًا", "amount": 300},
+    {"voucher": "000001", "method": "تمارا", "amount": 100},
+]
+
+builder = (
+    ReportBuilder("Financial Movement Report")
+    .page(size="A4", margin="10mm 11mm 12mm", page_number_position="bottom-center")
+    .header(Heading(value="فندق الاحقاف", level=2))
+    .add(Heading(value="تقرير الحركة المالية", level=3))
+    .table(columns, rows, totals={"voucher": "الإجمالي", "amount": 400})
+    .footer(Heading(value="طبع بواسطة: عبدالله", level=4))
+    .page_number("Page {page} of {pages}")
+)
+
+context = RenderingContext(language="ar", direction="rtl")
+builder.export_to("html", "report.html", context)       # "pdf", "xlsx"/"excel", "docx"/"word"
+pdf_bytes = builder.export("pdf", context)               # or get the bytes
+report = builder.build()                                 # or the Report, for any exporter
+```
+
+| Method | What it does |
+|---|---|
+| `ReportBuilder(title)` | Starts a report. |
+| `.page(size=, orientation=, margin=, page_number_position=, ...)` | Page settings; `margin` is a CSS shorthand of 1 to 4 values. |
+| `.header(*components, repeat=False)` | The header. `repeat=True` prints it on every page. |
+| `.add(*components)` | Any components, in order. |
+| `.table(columns, rows, totals=, title=, style=, table_style=)` | A table of prepared rows (mappings or `TableRow`) and an optional prepared totals row. |
+| `.spacer(height)` / `.page_break()` | Vertical space / a forced page break. |
+| `.footer(*components, repeat=False)` | The footer. `repeat=True` prints it on every page. |
+| `.page_number(format)` | Page numbers in print and PDF, at `page_number_position`. |
+| `.build()` | Returns the `Report`. |
+| `.export(format, context, **options)` | Returns the exported bytes. |
+| `.export_to(format, target, context, **options)` | Writes to a path or a binary stream. |
+
+Things the builder takes care of:
+
+- **Order.** The header always comes first, a repeated footer before the content (so it shows from the first page), and
+  a normal footer and the page number at the end, whatever order you call the methods in.
+- **No calculations.** `totals` is passed prepared and becomes the table's total row.
+- **Lazy rows.** Rows can be a generator or a database cursor; they are read one at a time while exporting. A generator
+  can only be read once, so build the report again for each export.
+- **Exporter options** pass through as keywords: `export("pdf", context, options=PdfOptions(workers=4))`,
+  `export("xlsx", context, options=ExcelOptions(mode="data", streaming=True))`.
+
+For finer control over a table, `TableBuilder` defines it column by column:
+
+```python
+from reportkit.builders import TableBuilder
+
+table = (
+    TableBuilder()
+    .column("voucher", "رقم السند", subtitle="Voucher No.", align="center")
+    .column("amount", "المبلغ", subtitle="Amount", format="currency", currency="﷼")
+    .rows(rows)
+    .totals({"voucher": "الإجمالي", "amount": 400})
+    .table_style(bordered=False, ruled=True)
+    .build()
+)
+builder.add(table)
+```
+
+Three complete, runnable examples (simple, branded, every format) are in [`examples/`](examples/README.md).
+
+## Building from components
+
+The builder is a thin layer over plain components, and you can always build the tree yourself; `build()` returns
+exactly this kind of `Report`.
 
 ```python
 from reportkit.components.document import Page, Report
@@ -62,34 +145,6 @@ context = RenderingContext(language="ar", direction="rtl")
 
 Rows can be any iterable, including generators and database cursors: they are read one at a time and never loaded into
 a list.
-
-### Builder
-
-`ReportBuilder` builds the same tree fluently. It returns a plain `Report`, so every exporter works unchanged, and it
-places a repeated header or footer before the content so it shows from the first page.
-
-```python
-from reportkit.builders import ReportBuilder, TableBuilder
-
-report = (
-    ReportBuilder("Financial Movement Report")
-    .page(size="A4", margin="10mm 11mm 12mm", page_number_position="bottom-center")
-    .header(Heading(value="تقرير الحركة المالية", level=2))
-    .table(columns, rows, totals={"voucher": "الإجمالي", "amount": 200})   # rows: mappings or TableRow, kept lazy
-    .spacer(20)
-    .footer(Text(value="Printed by ReportKit"), repeat=True)
-    .page_number("Page {page} of {pages}")
-    .build()
-)
-
-pdf_bytes = ReportBuilder("Quick").table(columns, rows).export("pdf", context)
-ReportBuilder("Quick").table(columns, rows).export_to("docx", "report.docx", context)
-
-table = TableBuilder().column("voucher", "رقم السند", subtitle="Voucher No.").rows(rows).totals(total).build()
-```
-
-Totals are passed prepared; the builder never calculates. Exporter options go through as keywords, for example
-`export("pdf", context, options=PdfOptions(workers=4))`.
 
 ## Exporting
 
