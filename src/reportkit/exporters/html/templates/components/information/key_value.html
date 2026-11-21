@@ -1,16 +1,9 @@
-<div
-    class="rk-key-value rk-key-value--{{ component.orientation }}"
-    {% if style %}style="{{ style }}"{% endif %}
->
-    <div class="rk-key-value__labels" {% if label_style %}style="{{ label_style }}"{% endif %}>
+<div class="rk-key-value rk-key-value--{{ component.orientation }}"{% if style %} style="{{ style }}"{% endif %}>
+    <div class="rk-key-value__labels"{% if label_style %} style="{{ label_style }}"{% endif %}>
         <span class="rk-key-value__label">{{ component.label }}</span>
-
-        {% if component.secondary_label %}
+        {%- if component.secondary_label %}
         <span class="rk-key-value__secondary">{{ component.secondary_label }}</span>
-        {% endif %}
+        {%- endif %}
     </div>
-
-    <div class="rk-key-value__value" {% if value_style %}style="{{ value_style }}"{% endif %}>
-        {{ "" if component.value is none else component.value }}
-    </div>
+    <div class="rk-key-value__value"{% if value_style %} style="{{ value_style }}"{% endif %}>{{ "" if component.value is none else component.value }}</div>
 </div>

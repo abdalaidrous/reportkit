@@ -63,11 +63,16 @@
     font-weight: 400;
 }
 
-/* Plain values keep explicit line breaks and pick their own direction ("12:47 AM" stays LTR in RTL tables). */
-.rk-table-cell__value,
+/* Each line of a plain value is its own block with a resolved dir, so "12:47 AM" stays LTR in RTL tables. */
+.rk-table-cell__line {
+    display: block;
+}
+
+/* The resolved dir only orders the text; alignment still comes from the cell (base.css aligns every [dir]). */
+.rk-table-cell__line,
+.rk-table-th__title,
 .rk-table-th__subtitle {
-    white-space: pre-line;
-    unicode-bidi: plaintext;
+    text-align: inherit;
 }
 
 /* Custom cells only lay out their children; the children keep their own styles. */
@@ -87,7 +92,7 @@
 .rk-table--layout-auto .rk-table-th__title,
 .rk-table--layout-auto .rk-table-th__subtitle,
 .rk-table-cell--nowrap,
-.rk-table-cell--nowrap .rk-table-cell__value {
+.rk-table-cell--nowrap .rk-table-cell__line {
     white-space: nowrap;
 }
 
@@ -181,8 +186,14 @@
 
 /* Print follows the table options: the header repeats and rows stay whole only when asked. */
 @media print {
+    /* Close the frame on every page instead of leaving it open down to the page edge. */
     .rk-table-container {
         overflow: visible;
+        border: 0;
+    }
+
+    .rk-table-container:not(.rk-table-container--ruled) > .rk-table {
+        border: 1px solid var(--rk-table-frame-color);
     }
 
     .rk-table thead,

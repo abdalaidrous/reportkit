@@ -1,5 +1,4 @@
 import re
-
 from ..base import BaseHtmlRenderer
 
 
@@ -13,8 +12,18 @@ class GridRenderer(BaseHtmlRenderer):
 
     template_name = "components/layout/grid.html"
 
-    @classmethod
-    def resolve_columns(cls, columns):
+    def render(self, component, context, engine):
+        """
+        Render grid columns and nested components.
+        """
+        style = context.resolve_style(component)
+        columns = self.resolve_columns(component.columns)
+        css_class = self.get_class(component.columns, style.direction or context.direction)
+        children = self.render_children(component, context, engine)
+        return engine.templates.render(self.template_name, children=children, columns=columns, flow=css_class, style=engine.styles.resolve(style))
+
+    @staticmethod
+    def resolve_columns(columns):
         """
         Resolve grid column definitions.
         """
@@ -30,11 +39,10 @@ class GridRenderer(BaseHtmlRenderer):
                 return " ".join(tracks)
         raise ValueError("Invalid grid column definition.")
 
-    def render(self, component, context, engine):
+    @staticmethod
+    def get_class(columns, direction):
         """
-        Render grid columns and nested components.
+        Get grid direction and column CSS classes.
         """
-        columns = self.resolve_columns(component.columns)
-        children = self.render_children(component, context, engine)
-        style = engine.styles.resolve(context.resolve_style(component))
-        return engine.templates.render(self.template_name, children=children, columns=columns, style=style)
+        count = columns if isinstance(columns, int) else len(columns.split())
+        return f"rk-grid--{direction} rk-grid--cols-{count}"

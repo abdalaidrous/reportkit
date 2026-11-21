@@ -2,6 +2,6 @@
     {%- if cell.content is not none -%}
     <div class="rk-table-cell__content">{{ cell.content | safe }}</div>
     {%- else -%}
-    <span class="rk-table-cell__value">{{ cell.display }}</span>
+    <span class="rk-table-cell__value">{% for line, direction in cell.lines %}<span class="rk-table-cell__line"{% if direction %} dir="{{ direction }}"{% endif %}>{{ line }}</span>{% endfor %}</span>
     {%- endif -%}
 </td>

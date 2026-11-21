@@ -147,8 +147,13 @@ reportkit/
 │       │   │   └── table/        # table.py: الجدول والصفوف، cell.py: الخلايا وchildren
 │       │   ├── templates/        # قوالب Jinja2 (table.html + cell.html مشترك بين tbody وtfoot)
 │       │   └── static/           # tokens, layout, table, print...
+│       ├── pdf/
+│       │   ├── exporter.py       # PdfExporter: HtmlExporter ثم PdfConversionService فقط
+│       │   ├── conversion.py     # PdfConversionService + WeasyPrintErrorMonitor (مراقبة لكل thread)
+│       │   ├── dependencies.py   # تحميل WeasyPrint الاختياري
+│       │   ├── exceptions.py     # PdfExportError
+│       │   └── resources/        # fetcher.py (URLFetcher لـ WeasyPrint 70) و policy.py (PdfResourcePolicy)
 │       ├── json.py
-│       ├── pdf.py
 │       └── excel.py
 ├── tests/                       # unittest: الجداول والصفحات
 ```
@@ -171,7 +176,7 @@ reportkit/
 
 ## تصدير PDF
 
-`PdfExporter` في `exporters/pdf.py` يولّد HTML كاملًا عبر `HtmlExporter` ثم يحوّله إلى PDF عبر WeasyPrint؛ لا توجد PDF Renderers للمكونات.
+`PdfExporter` في `exporters/pdf/` يولّد HTML كاملًا عبر `HtmlExporter` ثم يحوّله إلى PDF عبر WeasyPrint؛ لا توجد PDF Renderers للمكونات.
 
 ```python
 from reportkit.exporters.pdf import PdfExporter
