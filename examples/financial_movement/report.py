@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from reportkit.components.document import Report, Page, Header, Footer
-from reportkit.components.layout import Row, Column, Section, Spacer
+from reportkit.components.layout import Grid, Row, Column, Section, Spacer
 from reportkit.components.typography import Text, Heading
 from reportkit.components.table import Table, TableColumn, TableRow
 from reportkit.components.media import Image
@@ -23,21 +23,27 @@ LOGO = Path(__file__).with_name('logo.png')
 
 def info_row(items):
     """Display bilingual values without deriving any report data."""
-    return Row(children=[KeyValue(label=f'{en} / {ar}', value=value) for en, value, ar in items])
+    return Grid(style=Style(direction='ltr'), columns=2, children=[
+        KeyValue(label=en, secondary_label=ar, value=value, style=Style(direction='ltr', text_align='left'))
+        for en, value, ar in items
+    ])
 
 
 def title_row(english, arabic):
     """Build the bilingual section heading."""
-    return Row(style=SECTION_TITLE, children=[Text(value=english, style=SECONDARY), Heading(value=arabic, level=3, style=TITLE)])
+    return Grid(style=Style(direction='ltr'), columns='1fr 1fr', children=[
+        Text(value=english, style=SECONDARY.merge(Style(text_align='left'))),
+        Heading(value=arabic, level=3, style=TITLE.merge(Style(text_align='right'))),
+    ])
 
 
 def build_header():
     """Build the three-column bilingual hotel identity."""
     return Header(children=[
-        Row(children=[
-            Column(children=[Heading(value=BRANDING['name_en'], level=2, style=BRAND_NAME), Text(value=BRANDING['location_en'], style=SECONDARY), Text(value=BRANDING['address_en'], style=SECONDARY)]),
+        Grid(style=Style(direction='ltr'), columns='1fr auto 1fr', children=[
+            Column(align='start', direction='ltr', gap='3px', children=[Heading(value=BRANDING['name_en'], level=2, style=BRAND_NAME), Text(value=BRANDING['location_en'], style=SECONDARY), Text(value=BRANDING['address_en'], style=SECONDARY)]),
             Image(src=LOGO.as_uri(), alt='Hotel logo', width='76', height='76'),
-            Column(children=[Heading(value=BRANDING['name_ar'], level=2, style=BRAND_NAME), Text(value=BRANDING['location_ar'], style=SECONDARY), Text(value=BRANDING['address_ar'], style=SECONDARY)]),
+            Column(align='end', direction='rtl', gap='3px', children=[Heading(value=BRANDING['name_ar'], level=2, style=BRAND_NAME), Text(value=BRANDING['location_ar'], style=SECONDARY), Text(value=BRANDING['address_ar'], style=SECONDARY)]),
         ]),
         info_row([('C.R', BRANDING['cr'], 'السجل التجاري'), ('VAT No', BRANDING['vat'], 'الرقم الضريبي')]),
     ])
@@ -45,7 +51,7 @@ def build_header():
 
 def build_table(columns, rows, footer=None):
     """Display prepared rows and optional prepared footer."""
-    table_columns = [TableColumn(key=key, title=title, width=width, align='center') for key, title, width in columns]
+    table_columns = [TableColumn(key=key, title=title, width=width, align='center', header_align='center') for key, title, width in columns]
     table_rows = [TableRow(values=row) for row in rows]
     total_row = TableRow(values=footer, kind='subtotal') if footer is not None else None
     return Table(columns=table_columns, rows=table_rows, footer=total_row, style=TABLE)

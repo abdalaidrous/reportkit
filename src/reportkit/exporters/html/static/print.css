@@ -50,7 +50,7 @@
     }
 
     .rk-table-container {
-        overflow: visible;
+        overflow: hidden;
         border: 0;
     }
 

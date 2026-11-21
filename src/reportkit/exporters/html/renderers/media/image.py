@@ -1,4 +1,5 @@
 from ..base import BaseHtmlRenderer
+from ...assets import AssetResolver
 
 
 class ImageRenderer(BaseHtmlRenderer):
@@ -9,4 +10,5 @@ class ImageRenderer(BaseHtmlRenderer):
     def render(self, component, context, engine):
         """Render an image with its presentation properties."""
         style = engine.styles.resolve(context.resolve_style(component))
-        return engine.templates.render(self.template_name, component=component, style=style)
+        source = AssetResolver.resolve(component.src)
+        return engine.templates.render(self.template_name, component=component, source=source, style=style)

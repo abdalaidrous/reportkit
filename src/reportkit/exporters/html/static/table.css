@@ -1,6 +1,6 @@
 .rk-table-container {
     width: 100%;
-    overflow-x: auto;
+    overflow: hidden;
     border: 1px solid var(--rk-color-border);
     border-radius: var(--rk-radius-md);
 }
@@ -8,7 +8,7 @@
 .rk-table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: auto;
+    table-layout: fixed;
     font-size: var(--rk-font-sm);
     text-align: start;
 }
@@ -30,13 +30,18 @@
     color: var(--rk-color-muted);
     font-weight: 600;
     border-bottom: 1px solid var(--rk-color-border);
-    white-space: nowrap;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .rk-table td {
     padding: 13px 16px;
     border-bottom: 1px solid var(--rk-color-border);
     color: var(--rk-color-text);
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .rk-table th,
