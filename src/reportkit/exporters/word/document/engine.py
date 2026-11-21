@@ -23,12 +23,23 @@ class WordEngine:
         self.header_area = Area(self.word.section.header, self.word.content_width, fresh=True)
         self.footer_area = Area(self.word.section.footer, self.word.content_width, fresh=True)
 
-    def write(self, document, context):
+    def write(self, document, context, target):
         """
-        Render the report into the document body and return the DOCX bytes.
+        Render the report into the document body and write the DOCX to a file path or a binary stream.
         """
-        self.render(document, context, Area(self.word.document, self.word.content_width))
-        return self.word.save()
+        try:
+            self.render(document, context, Area(self.word.document, self.word.content_width))
+        except BaseException:
+            self.word.spool.close()
+            raise
+        self.word.save(target)
+
+    @property
+    def spool(self):
+        """
+        Return the spool that keeps finished table rows out of memory.
+        """
+        return self.word.spool
 
     def render(self, component, context, area):
         """

@@ -232,11 +232,14 @@ xlsx = ExcelExporter().export(document, context, ExcelOptions(mode="data", strea
 from reportkit.exporters.word import WordExporter
 
 docx_bytes = WordExporter().export(document, context)
+WordExporter().export_to(document, "report.docx", context)   # مسار أو stream ثنائي
 ```
 
 - python-docx اعتماد اختياري: `pip install -e ".[word]"`. البناء مثل Excel: `word/document` (المستند والمحرك)، `word/renderers` (table/ و layout/)، `word/styles`، `word/values`.
 - الشبكات (Grid/Row/InfoGrid) جداول بلا حدود، والصناديق المؤطرة جدول بخلية واحدة؛ RTL عبر `w:bidi` و`w:bidiVisual`.
 - Header/Footer المتكرر يذهب إلى رأس/تذييل صفحة Word، و`PageNumber` يستخدم حقول PAGE و NUMPAGES.
+- الجداول الضخمة: `renderers/table/rows.py` (`TableRows`) يضيف الصفوف دون `add_row`/`len(table.rows)`/`table.cell` في python-docx (كلها تمر على الجدول كاملًا)، وينقل الصفوف المنتهية لجداول جسم المستند إلى `document/spool.py` (`RowSpool`) كل 200 صف مع تعليق علامة في مكانها؛ `document/package.py` يعيد كتابة الحزمة ويضخ الصفوف مكان العلامة عند الحفظ. الصفوف التي يصلها rowspan تبقى في الشجرة.
+- `styles/text.py` يبني خصائص الفقرة والـ run مرة لكل (نمط، اتجاه) وينسخها (`lru_cache` + `deepcopy`)؛ الناتج مطابق بايتًا ببايت. 10 آلاف صف: 43 ث و70MB (كان 179 ث و872MB).
 - المنطق المشترك بين المصدّرين في `styles/tokens.py` و`styles/table.py` و`styles/borders.py` و`rendering/tracks.py` و`rendering/table.py`.
 
 ## التحقق

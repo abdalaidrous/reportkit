@@ -1,11 +1,19 @@
-from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
-from docx.shared import Pt, RGBColor
+from copy import deepcopy
+from functools import lru_cache
 
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
+from docx.oxml import OxmlElement
+from docx.shared import Pt, RGBColor
+from docx.text.paragraph import Paragraph
+from docx.text.run import Run
+
+from ....styles.style import Style
 from ....styles.tokens import token
 from ...html.direction import text_direction
 from .xml import child, hex_color, set_attributes, set_bidi_paragraph
 
 DEFAULT_FONT = "Arial"
+TEMPLATES = 4096
 ALIGNMENTS = {"left": WD_ALIGN_PARAGRAPH.LEFT, "right": WD_ALIGN_PARAGRAPH.RIGHT, "center": WD_ALIGN_PARAGRAPH.CENTER, "justify": WD_ALIGN_PARAGRAPH.JUSTIFY}
 
 
@@ -34,7 +42,28 @@ def add_run(paragraph, text, style, direction):
 
 def format_paragraph(paragraph, style, direction):
     """
-    Apply direction, alignment and spacing to a paragraph; borders and backgrounds belong to cells and frames.
+    Apply direction, alignment and spacing to a paragraph; a paragraph without properties gets a copy of the
+    properties built once for the same alignment and direction (large tables repeat them on every row).
+    """
+    if paragraph._p.pPr is None:
+        paragraph._p.insert(0, deepcopy(paragraph_template(style.text_align, direction)))
+        return
+    apply_paragraph_format(paragraph, style, direction)
+
+
+@lru_cache(maxsize=TEMPLATES)
+def paragraph_template(align, direction):
+    """
+    Build the paragraph properties for one alignment and direction.
+    """
+    paragraph = Paragraph(OxmlElement("w:p"), None)
+    apply_paragraph_format(paragraph, Style(text_align=align), direction)
+    return paragraph._p.pPr
+
+
+def apply_paragraph_format(paragraph, style, direction):
+    """
+    Write direction, alignment and spacing into the paragraph properties.
     """
     if direction == "rtl":
         set_bidi_paragraph(paragraph)
@@ -44,7 +73,28 @@ def format_paragraph(paragraph, style, direction):
 
 def format_run(run, style, direction):
     """
-    Apply the font, size, weight, slant and color to a run, for Latin and Arabic (complex script) text alike.
+    Apply the font, size, weight, slant and color to a run, for Latin and Arabic (complex script) text alike; a run
+    without properties gets a copy of the properties built once for the same style and direction.
+    """
+    if run._r.rPr is None:
+        run._r.insert(0, deepcopy(run_template(style, direction)))
+        return
+    apply_run_format(run, style, direction)
+
+
+@lru_cache(maxsize=TEMPLATES)
+def run_template(style, direction):
+    """
+    Build the run properties for one style and direction.
+    """
+    run = Run(OxmlElement("w:r"), None)
+    apply_run_format(run, style, direction)
+    return run._r.rPr
+
+
+def apply_run_format(run, style, direction):
+    """
+    Write the font, size, weight, slant and color into the run properties.
     """
     family, size = (style.font_family or DEFAULT_FONT).split(",")[0].strip(" '\""), points(style.font_size or token("--rk-font-md"))
     run.font.name, run.font.size, run.font.bold, run.font.italic = family, Pt(size), is_bold(style.font_weight), style.font_style == "italic"

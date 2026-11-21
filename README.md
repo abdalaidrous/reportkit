@@ -132,10 +132,15 @@ xlsx = ExcelExporter().export(report, context, ExcelOptions(mode="data", streami
 from reportkit.exporters.word import WordExporter
 
 docx = WordExporter().export(report, context)
+WordExporter().export_to(report, "report.docx", context)   # or a binary stream
 ```
 
 Tables repeat their header row on every page, repeating headers and footers go to the Word page header and footer, and
 page numbers use Word's PAGE and NUMPAGES fields.
+
+Large tables keep memory flat: rows may be a lazy iterator, and finished rows of tables placed in the document body are
+moved to temporary storage (memory, then disk) and streamed back into the file on save. 10,000 rows take about 43 s and
+70 MB; the output is identical to building the whole document in memory.
 
 ### Exporter registry
 

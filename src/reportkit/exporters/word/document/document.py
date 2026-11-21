@@ -7,13 +7,16 @@ from docx.shared import Mm, Pt
 from ....styles.tokens import token
 from ..exceptions import WordExportError
 from ..styles.text import DEFAULT_FONT, points
+from .package import DocxPackage
+from .spool import RowSpool
 
 PAPER_MILLIMETRES = {"A3": (297, 420), "A4": (210, 297), "A5": (148, 210), "Letter": (216, 279), "Legal": (216, 356)}
 
 
 class WordDocument:
     """
-    Own the python-docx document: page size, orientation and margins, default font, and saving to bytes.
+    Own the python-docx document: page size, orientation and margins, default font, the spool of finished table rows,
+    and saving.
     """
 
     def __init__(self, title, page):
@@ -23,6 +26,7 @@ class WordDocument:
         self.document = Document()
         self.document.core_properties.title = title or ""
         self.section = self.document.sections[0]
+        self.spool = RowSpool()
         self.set_page(page)
         self.set_default_font()
 
@@ -52,16 +56,20 @@ class WordDocument:
         normal.font.name, normal.font.size = DEFAULT_FONT, Pt(points(token("--rk-font-md")))
         normal.paragraph_format.space_after = Pt(0)
 
-    def save(self):
+    def save(self, target):
         """
-        Serialize the document to DOCX bytes.
+        Write the DOCX to a file path or a binary stream, splicing the spooled table rows back in.
         """
-        buffer = BytesIO()
         try:
+            if not self.spool.segments:
+                return self.document.save(target)
+            buffer = BytesIO()
             self.document.save(buffer)
+            DocxPackage.write(buffer.getvalue(), self.spool, target)
         except (OSError, ValueError, TypeError) as error:
             raise WordExportError(f"Could not write the DOCX file: {error}") from error
-        return buffer.getvalue()
+        finally:
+            self.spool.close()
 
 
 def length(value):
