@@ -170,5 +170,22 @@ def export_html(destination):
     return destination
 
 
+def export_pdf(destination):
+    """
+    Export to PDF through PdfExporter (needs the optional WeasyPrint dependency); saving the bytes is the caller's job.
+    """
+    from reportkit.exporters.pdf import PdfExporter
+    from reportkit.rendering.context import RenderingContext
+
+    pdf_bytes = PdfExporter.export(build_report(), RenderingContext(language='ar', direction='rtl'))
+    with open(destination, 'wb') as file:
+        file.write(pdf_bytes)
+    return destination
+
+
 if __name__ == '__main__':
+    import sys
+
     export_html(Path(__file__).with_name('reportkit_output.html'))
+    if '--pdf' in sys.argv:
+        export_pdf(Path(__file__).with_name('reportkit_output.pdf'))

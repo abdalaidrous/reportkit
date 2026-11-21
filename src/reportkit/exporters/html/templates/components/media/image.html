@@ -4,5 +4,5 @@
     alt="{{ component.alt }}"
     {% if component.width %}width="{{ component.width }}"{% endif %}
     {% if component.height %}height="{{ component.height }}"{% endif %}
-    style="object-fit: {{ component.fit }};{% if style %} {{ style }}{% endif %}"
+    style="object-fit: {{ component.fit }};{% if component.width and component.width.isdigit() %} width: {{ component.width }}px;{% endif %}{% if component.height and component.height.isdigit() %} height: {{ component.height }}px;{% endif %}{% if style %} {{ style }}{% endif %}"
 >

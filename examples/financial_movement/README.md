@@ -17,7 +17,7 @@ From the ReportKit project root, install the library and dependencies, then run:
 python -m examples.financial_movement.report
 ```
 
-This writes `examples/financial_movement/reportkit_output.html`.
+This writes `examples/financial_movement/reportkit_output.html`. Add `--pdf` to also write `reportkit_output.pdf` through `PdfExporter` (needs the optional WeasyPrint dependency, or run it in Docker as described in `CLAUDE.md`).
 
 Page numbers are print margin boxes: they appear in the browser print preview (Ctrl+P) and in PDFs printed from the HTML, not in the normal screen view.
 

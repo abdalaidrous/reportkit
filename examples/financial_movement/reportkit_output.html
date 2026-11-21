@@ -415,7 +415,7 @@ body {
 }
 
 /* Ruled: no frame or vertical lines; heavy rules around the header and above the total. */
-.rk-table-container:has(> .rk-table--ruled) {
+.rk-table-container--ruled {
     border: 0;
     border-radius: 0;
 }
@@ -691,7 +691,7 @@ body {
     alt="Hotel logo"
     width="76"
     height="76"
-    style="object-fit: contain;"
+    style="object-fit: contain; width: 76px; height: 76px;"
 ><div class="rk-column" style="align-items: start; gap: 2px; direction: ltr">
     <h2 class="rk-heading rk-heading--2" style="font-size: 15px; font-weight: 700; text-align: left; margin: 0px">
     Alahqaf Hotel
@@ -851,7 +851,7 @@ body {
 </h3><p class="rk-text" style="font-size: 10px; color: #555555; text-align: left; margin: 0px">
     Summary by Payment Method
 </p>
-</div><div class="rk-table-container">
+</div><div class="rk-table-container rk-table-container--ruled">
     <table class="rk-table rk-table--layout-auto rk-table--ruled rk-table--repeat-header rk-table--avoid-row-break" style="font-size: 10.5px">
         
         <colgroup>

@@ -12,5 +12,10 @@ dependencies = [
     "Jinja2==3.1.6",
 ]
 
+[project.optional-dependencies]
+pdf = [
+    "weasyprint>=70",
+]
+
 [tool.setuptools.packages.find]
 where = ["src"]

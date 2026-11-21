@@ -169,6 +169,29 @@ reportkit/
 5. لا تضع HTML أو CSS أو حسابات داخل Component.
 6. أضف اختبارًا أو مثالًا عامًا، ثم شغّل compile والأمثلة.
 
+## تصدير PDF
+
+`PdfExporter` في `exporters/pdf.py` يولّد HTML كاملًا عبر `HtmlExporter` ثم يحوّله إلى PDF عبر WeasyPrint؛ لا توجد PDF Renderers للمكونات.
+
+```python
+from reportkit.exporters.pdf import PdfExporter
+
+pdf_bytes = PdfExporter.export(document)            # bytes تبدأ بـ %PDF
+with open("report.pdf", "wb") as file:              # الحفظ مسؤولية التطبيق
+    file.write(pdf_bytes)
+```
+
+- WeasyPrint اعتماد اختياري: `pip install -e ".[pdf]"`، ويحتاج مكتبات Pango في النظام. عند غيابه يُرفع `ImportError` برسالة واضحة.
+- الموارد: الصور المحلية تُضمَّن كـ data URI عبر `AssetResolver`. أثناء التحويل يُسمح فقط بـ `data:`، وبملفات داخل `base_url` إن مُرِّر؛ الشبكة وبقية الملفات المحلية تُمنع ويُرفع `PdfExportError` مع السبب الأصلي.
+- Header/Footer المتكرر (`repeat=True`) يجب أن يأتي قبل المحتوى في الشجرة حتى يظهر من الصفحة الأولى (سلوك running elements في CSS).
+- على Windows تُشغَّل اختبارات PDF عبر Docker:
+
+```powershell
+docker build -t reportkit-pdf .
+docker run --rm reportkit-pdf
+docker run --rm -v "${PWD}/examples:/app/examples" reportkit-pdf python -m examples.financial_movement.report --pdf
+```
+
 ## التحقق
 
 ```powershell

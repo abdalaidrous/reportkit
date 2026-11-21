@@ -24,7 +24,7 @@ class TableRenderer(BaseHtmlRenderer):
         rows = self.prepare_rows(component, context, engine)
         footer = self.prepare_row(component.footer, component.columns, context, engine) if component.footer else None
         header = [self.prepare_header(column) for column in component.columns]
-        return engine.templates.render(self.template_name, table_class=self.table_class(component.table_style), columns=component.columns, header=header, caption=component.header, rows=rows, footer=footer, show_header=component.table_style.show_header, style=style)
+        return engine.templates.render(self.template_name, container_class="rk-table-container rk-table-container--ruled" if component.table_style.ruled else "rk-table-container", table_class=self.table_class(component.table_style), columns=component.columns, header=header, caption=component.header, rows=rows, footer=footer, show_header=component.table_style.show_header, style=style)
 
     def prepare_rows(self, component, context, engine):
         """

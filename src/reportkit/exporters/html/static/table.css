@@ -154,7 +154,7 @@
 }
 
 /* Ruled: no frame or vertical lines; heavy rules around the header and above the total. */
-.rk-table-container:has(> .rk-table--ruled) {
+.rk-table-container--ruled {
     border: 0;
     border-radius: 0;
 }
