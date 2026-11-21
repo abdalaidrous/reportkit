@@ -3,44 +3,47 @@ from .base import BaseHtmlRenderer
 
 class SectionRenderer(BaseHtmlRenderer):
     """
-    Render section containers.
+    Render styled report sections.
     """
 
     template_name = "components/section.html"
 
     def render(self, component, context, engine) -> str:
         """
-        Render a section and its children.
+        Render a section with its children and styles.
         """
         children = self.render_children(component, context, engine)
-        return engine.templates.render(self.template_name, children=children)
+        style = engine.styles.resolve(context.resolve_style(component))
+        return engine.templates.render(self.template_name, children=children, style=style)
 
 
 class RowRenderer(BaseHtmlRenderer):
     """
-    Render horizontal component layouts.
+    Render styled horizontal layouts.
     """
 
     template_name = "components/row.html"
 
     def render(self, component, context, engine) -> str:
         """
-        Render a row and its children.
+        Render a row with its children and styles.
         """
         children = self.render_children(component, context, engine)
-        return engine.templates.render(self.template_name, children=children)
+        style = engine.styles.resolve(context.resolve_style(component))
+        return engine.templates.render(self.template_name, children=children, style=style)
 
 
 class ColumnRenderer(BaseHtmlRenderer):
     """
-    Render vertical component layouts.
+    Render styled vertical layouts.
     """
 
     template_name = "components/column.html"
 
     def render(self, component, context, engine) -> str:
         """
-        Render a column and its children.
+        Render a column with its children and styles.
         """
         children = self.render_children(component, context, engine)
-        return engine.templates.render(self.template_name, children=children)
+        style = engine.styles.resolve(context.resolve_style(component))
+        return engine.templates.render(self.template_name, children=children, style=style)

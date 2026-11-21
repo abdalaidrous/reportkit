@@ -31,10 +31,12 @@ src/reportkit/exporters/html/__init__.py
 src/reportkit/exporters/html/engine.py
 src/reportkit/exporters/html/exporter.py
 src/reportkit/exporters/html/registry.py
+src/reportkit/exporters/html/styles.py
 src/reportkit/exporters/html/templates.py
 src/reportkit/exporters/html/renderers/__init__.py
 src/reportkit/exporters/html/renderers/base.py
 src/reportkit/exporters/html/renderers/document.py
+src/reportkit/exporters/html/renderers/layout.py
 src/reportkit/exporters/html/renderers/text.py
 src/reportkit/rendering/__init__.py
 src/reportkit/rendering/context.py
