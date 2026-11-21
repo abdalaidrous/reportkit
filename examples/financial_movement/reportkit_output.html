@@ -52,9 +52,9 @@ body {
 }
 
 .rk-report {
-    max-width: 1120px;
-    margin: 32px auto;
-    padding: var(--rk-space-7);
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 0;
     background: var(--rk-color-surface);
     border: 1px solid var(--rk-color-border);
     border-radius: var(--rk-radius-lg);
@@ -458,6 +458,16 @@ body {
     box-sizing: border-box;
     width: 100%;
     min-width: 0;
+    max-width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    padding: 10mm;
+    background: #ffffff;
+}
+
+.rk-page[data-page-orientation="landscape"] {
+    max-width: 297mm;
+    min-height: 210mm;
 }
 
 .rk-page-break {
@@ -532,6 +542,9 @@ body {
     }
 
     .rk-page {
+        max-width: none;
+        min-height: 0;
+        padding: 0;
         break-after: page;
         page-break-after: always;
     }
