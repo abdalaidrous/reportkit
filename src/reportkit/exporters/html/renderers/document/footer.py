@@ -10,4 +10,5 @@ class FooterRenderer(BaseHtmlRenderer):
         """Render the footer and its children."""
         style = engine.styles.resolve(context.resolve_style(component))
         children = self.render_children(component, context, engine)
-        return engine.templates.render(self.template_name, style=style, children=children)
+        css_class = "rk-footer rk-running-footer" if component.repeat else "rk-footer"
+        return engine.templates.render(self.template_name, style=style, children=children, css_class=css_class)

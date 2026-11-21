@@ -10,4 +10,5 @@ class HeaderRenderer(BaseHtmlRenderer):
         """Render the header and its children."""
         style = engine.styles.resolve(context.resolve_style(component))
         children = self.render_children(component, context, engine)
-        return engine.templates.render(self.template_name, style=style, children=children)
+        css_class = "rk-header rk-running-header" if component.repeat else "rk-header"
+        return engine.templates.render(self.template_name, style=style, children=children, css_class=css_class)

@@ -1,7 +1,9 @@
 from ...components.document import Page
 from ...components.pagination import PageNumber
 from .page_margins import PageMarginRenderer
+from .margin_registry import PageMarginRegistry
 from .pagination import PageNumberStyleResolver
+from .running_elements import RunningElementResolver
 from .page_styles import PageStyleResolver
 
 
@@ -20,11 +22,18 @@ class HtmlPageResolver:
         numbers = cls.find_page_numbers(document)
         if len(numbers) > 1:
             raise ValueError("Only one page numbering definition is supported.")
-        rules = []
+        margins = PageMarginRegistry()
         if numbers:
             content = PageNumberStyleResolver.resolve(numbers[0].format)
-            rules.append(PageMarginRenderer.render(pages[0].page_number_position, content))
-        return PageStyleResolver.render(pages[0], rules)
+            margins.register(pages[0].page_number_position, content)
+        running = RunningElementResolver.find_components(document)
+        RunningElementResolver.validate(running)
+        for component in running:
+            name, position = RunningElementResolver.ELEMENTS[type(component)]
+            margins.register(position, f"element({name})")
+        page_css = PageStyleResolver.render(pages[0], margins.render())
+        running_css = RunningElementResolver.resolve(document)
+        return page_css + ("\n" + running_css if running_css else "")
 
     @classmethod
     def find_pages(cls, component):

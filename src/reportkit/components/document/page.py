@@ -13,7 +13,7 @@ class Page(Container):
     margin_right: str = "15mm"
     margin_bottom: str = "15mm"
     margin_left: str = "15mm"
-    page_number_position: str = "bottom-center"
+    page_number_position: str = "bottom-right"
 
     def __post_init__(self):
         """Validate page settings."""
