@@ -215,7 +215,8 @@ xlsx = ExcelExporter().export(document, context, ExcelOptions(mode="data", strea
 - openpyxl اعتماد اختياري: `pip install -e ".[excel]"` (و Pillow للصور).
 - لا حسابات ولا معادلات: القيم تُكتب كما وصلت، والنصوص تُخزن كنص دائمًا (حماية من Formula Injection).
 - Decimal: يُكتب كرقم إذا كان ضمن 15 رقمًا معنويًا (دقة Excel)، وإلا يُرفع `ExcelExportError` أو يُكتب نصًا مع `decimal_policy="text"`.
-- `formatted` لا يعمل مع `streaming=True` (يحتاج دمج خلايا وكتابة غير متسلسلة)؛ استخدم `data` للتقارير الضخمة.
+- `formatted` لا يعمل مع `streaming=True` (يحتاج دمج خلايا وكتابة غير متسلسلة) ويحتفظ بالورقة كاملة في الذاكرة، ويستغرق نحو 2.5 ms لكل صف (50 ألف صف ≈ دقيقتان).
+- للتقارير الضخمة (عشرات الآلاف من الصفوف فأكثر) استخدم `ExcelOptions(mode="data", streaming=True)`: ذاكرة شبه ثابتة (نحو 84 MB لـ 100 ألف صف).
 - غير مدعوم: `Chart` و`PageCount` (وهما بلا Renderer في HTML أيضًا)، والصور البعيدة وصور SVG.
 
 ## التحقق

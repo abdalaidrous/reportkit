@@ -1,5 +1,7 @@
 import math
+from itertools import product
 
+from openpyxl.cell.cell import MergedCell
 from openpyxl.drawing.image import Image as ExcelImage
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.cell_range import CellRange
@@ -8,8 +10,8 @@ from openpyxl.worksheet.pagebreak import Break
 
 from ....styles.style import Style
 from ..styles import get_fill, get_side, pixels, token
-from .borders import edge_border, edge_borders
-from .cells import check_limits, write_value
+from .borders import edge_border, edge_borders, edge_style
+from .cells import apply_style, check_limits, write_value
 from .constants import CHARACTER_WIDTH, GRID_COLUMNS, LINE_HEIGHT, PAPER_SIZES, SCREEN_WIDTH_SCALE
 from .page import content_width, millimetres
 
@@ -24,7 +26,7 @@ class FormattedSheet:
         """
         Size the column grid from the page content width and apply the page print settings.
         """
-        self.worksheet, self.direction, self.last_row = worksheet, direction, 0
+        self.worksheet, self.direction, self.last_row, self.styles = worksheet, direction, 0, {}
         self.content_pixels = content_width(page) * SCREEN_WIDTH_SCALE
         self.unit_pixels = self.content_pixels / GRID_COLUMNS
         worksheet.sheet_view.showGridLines = False
@@ -35,33 +37,43 @@ class FormattedSheet:
 
     def place(self, row, column, width, value, style=Style(), number_format=None, height=1, padding=4):
         """
-        Write a value into a block of cells, merge it, style every cell of the block and fit the row height.
+        Write a value with its style into the block's first cell, merge the block (which carries the borders to its edge
+        cells) and fit the row height.
         """
         check_limits(row + height - 1, column + width - 1)
-        for cell in self.block(row, column, width, height):
-            write_value(cell, None, style, self.direction)
-        write_value(self.worksheet.cell(row=row, column=column), value, style, self.direction, number_format)
+        write_value(self.worksheet.cell(row=row, column=column), value, style, self.direction, self.styles, number_format)
         if width > 1 or height > 1:
-            self.merge(row, column, width, height)
+            self.merge(row, column, width, height, style)
         if height == 1:
             self.fit_row(row, value, width, style, padding)
         self.last_row = max(self.last_row, row + height - 1)
 
-    def merge(self, row, column, width, height):
+    def merge(self, row, column, width, height, style):
         """
-        Merge a block without openpyxl's linear scan of earlier merges, which makes long tables quadratic; the layout
-        never overlaps blocks (place_cells refuses overlapping spans), so the scan is not needed.
+        Merge a block and give its edge cells the block's borders. openpyxl's merge_cells scans every earlier merge and
+        restyles each cell, which makes long tables slow; the layout never overlaps blocks (place_cells refuses
+        overlapping spans), so the range is registered directly.
         """
-        merged = MergedCellRange(self.worksheet, CellRange(min_row=row, min_col=column, max_row=row + height - 1, max_col=column + width - 1).coord)
-        self.worksheet.merged_cells.ranges.add(merged)
-        self.worksheet._clean_merge_range(merged)
+        self.worksheet.merged_cells.ranges.add(MergedCellRange(self.worksheet, CellRange(min_row=row, min_col=column, max_row=row + height - 1, max_col=column + width - 1).coord))
+        for current_row, current_column in product(range(row, row + height), range(column, column + width)):
+            if (current_row, current_column) != (row, column):
+                self.add_merged_cell(current_row, current_column, edge_style(style, current_column == column, current_column == column + width - 1, current_row == row, current_row == row + height - 1))
+
+    def add_merged_cell(self, row, column, style):
+        """
+        Put a covered cell of a merged block in place, carrying the block border on its edge sides.
+        """
+        cell = MergedCell(self.worksheet, row=row, column=column)
+        self.worksheet._cells[(row, column)] = cell
+        if style is not None:
+            apply_style(cell, style, self.direction, self.styles)
 
     def outline(self, row, column, width, height, style):
         """
         Draw a component's background and border around the block it used, keeping inner cell borders.
         """
         fill, sides = get_fill(style.background_color), [get_side(side) for side in edge_borders(style)]
-        for cell in self.block(row, column, width, height):
+        for cell in self.block(row, column, width, height) if fill else self.edges(row, column, width, height):
             if fill:
                 cell.fill = fill
             cell.border = edge_border(cell, sides, row, column, width, height)
@@ -72,6 +84,14 @@ class FormattedSheet:
         Return every cell of a block.
         """
         return [cell for cells in self.worksheet.iter_rows(min_row=row, max_row=row + height - 1, min_col=column, max_col=column + width - 1) for cell in cells]
+
+    def edges(self, row, column, width, height):
+        """
+        Return only the cells on the border of a block, so framing a long table stays proportional to its height.
+        """
+        last_row, last_column = row + height - 1, column + width - 1
+        positions = {(row, current) for current in range(column, last_column + 1)} | {(last_row, current) for current in range(column, last_column + 1)} | {(current, column) for current in range(row, last_row + 1)} | {(current, last_column) for current in range(row, last_row + 1)}
+        return [self.worksheet.cell(row=current_row, column=current_column) for current_row, current_column in sorted(positions)]
 
     def fit_row(self, row, value, width, style, padding):
         """

@@ -13,7 +13,7 @@ class DataSheet:
         """
         Wrap a worksheet that only receives appended rows.
         """
-        self.worksheet, self.direction, self.rows, self.columns = worksheet, direction, 0, 0
+        self.worksheet, self.direction, self.rows, self.columns, self.styles = worksheet, direction, 0, 0, {}
 
     def append(self, cells):
         """
@@ -28,7 +28,7 @@ class DataSheet:
         Build a write-only cell carrying its own format.
         """
         cell = WriteOnlyCell(self.worksheet)
-        write_value(cell, value, style, self.direction, number_format)
+        write_value(cell, value, style, self.direction, self.styles, number_format)
         return cell
 
     def set_column_width(self, column, characters):
