@@ -19,7 +19,7 @@ from reportkit.components.pagination import PageCount, PageNumber  # noqa: E402
 from reportkit.components.table import Table, TableCell, TableColumn, TableRow, TableStyle  # noqa: E402
 from reportkit.components.typography import Heading, Text  # noqa: E402
 from reportkit.exporters.excel import ExcelExporter, ExcelExportError, ExcelOptions  # noqa: E402
-from reportkit.exporters.excel import worksheet as excel_worksheet  # noqa: E402
+from reportkit.exporters.excel.worksheet import constants as excel_constants  # noqa: E402
 from reportkit.exporters.html.exporter import HtmlExporter  # noqa: E402
 from reportkit.exporters.registry import ExporterRegistry  # noqa: E402
 from reportkit.rendering.context import RenderingContext  # noqa: E402
@@ -204,6 +204,16 @@ class TestTables:
         assert [cell.value for cell in data[2]] == ["ممتد", None, "tall"]
         assert [cell.value for cell in data[3]] == ["a", "b", None]
 
+    def test_overlapping_spans_are_refused(self):
+        rows = [TableRow(cells=[TableCell(value="a"), TableCell(value="tall", rowspan=2)]), TableRow(cells=[TableCell(value="wide", colspan=2)])]
+        with pytest.raises(ExcelExportError, match="overlaps"):
+            export(report(Table(columns=COLUMNS, rows=rows)))
+
+    def test_long_duplicate_table_names_stay_valid(self):
+        tables = [Table(columns=COLUMNS[:1], header="ملخص الحركات المالية حسب طريقة الدفع", rows=[]) for _ in range(12)]
+        names = export(report(*tables), mode="data").sheetnames
+        assert len(set(names)) == 12 and all(len(name) <= 31 for name in names)
+
     def test_composite_cell_and_multiline_text(self):
         rows = [TableRow(values={"name": TableCell(children=[Text(value="14/11/2026"), Text(value="12:47 AM")]), "amount": "سطر\nثاني"})]
         sheet = export(report(Table(columns=COLUMNS[:2], rows=rows))).active
@@ -232,9 +242,9 @@ class TestTables:
         assert sheet["A20001"].value == "row 19999" and sheet["B20001"].value == 19999
 
     def test_row_and_column_limits(self):
-        with mock.patch.object(excel_worksheet, "MAX_ROWS", 3), pytest.raises(ExcelExportError, match="limited"):
+        with mock.patch.object(excel_constants, "MAX_ROWS", 3), pytest.raises(ExcelExportError, match="limited"):
             export(report(Table(columns=COLUMNS[:1], rows=(TableRow(values={"name": index}) for index in range(5)))), mode="data", streaming=True)
-        with mock.patch.object(excel_worksheet, "MAX_COLUMNS", 2), pytest.raises(ExcelExportError, match="limited"):
+        with mock.patch.object(excel_constants, "MAX_COLUMNS", 2), pytest.raises(ExcelExportError, match="limited"):
             export(report(movements()), mode="data")
 
 
