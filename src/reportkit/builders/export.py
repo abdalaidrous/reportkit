@@ -36,20 +36,35 @@ class ReportExport:
         """
         exporter = cls.exporter(format)
         if hasattr(exporter, "export_to"):
-            return exporter.export_to(report, target, context, **options)
-        content = exporter.export(report, context, **options)
-        if hasattr(target, "write"):
-            target.write(content)
+            exporter.export_to(report, target, context, **options)
         else:
-            Path(target).write_bytes(content)
+            cls.write(target, exporter.export(report, context, **options))
         return target
+
+    @staticmethod
+    def write(target, data):
+        """
+        Write exported bytes to a file path or a binary stream.
+        """
+        if hasattr(target, "write"):
+            target.write(data)
+            return
+        Path(target).write_bytes(data)
 
     @classmethod
     def exporter(cls, format: str):
         """
         Create the exporter registered for the format.
         """
-        package = cls.PACKAGES.get(format)
-        if package is not None:
-            import_module(f"..exporters.{package}", __package__)
+        cls.load(format)
         return ExporterRegistry.get(format)()
+
+    @classmethod
+    def load(cls, format: str):
+        """
+        Load the exporter package for the format so its registration is available.
+        """
+        package = cls.PACKAGES.get(format)
+
+        if package:
+            import_module(f"..exporters.{package}", __package__)
