@@ -13,12 +13,13 @@ from .values import is_formula_like
 
 MAX_ROWS = 1_048_576
 MAX_COLUMNS = 16_384
-GRID_COLUMNS = 60
+GRID_COLUMNS = 40
 PAPER_SIZES = {"A3": 8, "A4": 9, "A5": 11, "Letter": 1, "Legal": 5}
 PAPER_MILLIMETRES = {"A3": (297, 420), "A4": (210, 297), "A5": (148, 210), "Letter": (216, 279), "Legal": (216, 356)}
 PIXELS_PER_MILLIMETRE = 96 / 25.4
-CHARACTER_WIDTH = 0.6
-LINE_HEIGHT = 1.45
+CHARACTER_WIDTH = 0.55
+LINE_HEIGHT = 1.3
+SCREEN_WIDTH_SCALE = 1.6
 
 
 def write_value(cell, value, style, direction, number_format=None):
@@ -44,16 +45,16 @@ def check_limits(row, column):
 
 class FormattedSheet:
     """
-    Page-sized worksheet for the formatted mode: a grid of narrow columns spanning the printable width, merged blocks,
-    borders, images and print settings, with no gridlines outside the report.
+    Worksheet for the formatted mode: a grid of narrow columns wider than the printable width for comfortable reading
+    on screen (printing fits it to the page width), merged blocks, borders, images and print settings, no gridlines.
     """
 
     def __init__(self, worksheet, direction, page):
         """
-        Size the column grid to the page content width and apply the page print settings.
+        Size the column grid from the page content width and apply the page print settings.
         """
         self.worksheet, self.direction, self.last_row = worksheet, direction, 0
-        self.content_pixels = content_width(page)
+        self.content_pixels = content_width(page) * SCREEN_WIDTH_SCALE
         self.unit_pixels = self.content_pixels / GRID_COLUMNS
         worksheet.sheet_view.showGridLines = False
         for column in range(1, GRID_COLUMNS + 1):

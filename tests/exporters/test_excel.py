@@ -108,6 +108,14 @@ class TestWorkbook:
         assert [cell.value for cell in table[1]] == ["البيان / Description", "المبلغ / Amount", "التاريخ / Date"]
         assert [cell.value for cell in book["Report"][1]] == ["الفترة", "2026-11"]
 
+    def test_cell_formats_declare_apply_flags(self):
+        import zipfile
+
+        data = ExcelExporter().export(report(movements()), RenderingContext(direction="rtl"))
+        styles = zipfile.ZipFile(BytesIO(data)).read("xl/styles.xml").decode("utf-8")
+        cell_formats = styles[styles.index("<cellXfs"):styles.index("</cellXfs>")]
+        assert cell_formats.count("<xf ") == cell_formats.count('applyFill="1"') == cell_formats.count('applyBorder="1"')
+
     def test_formatted_mode_cannot_stream(self):
         with pytest.raises(ExcelExportError, match="streaming"):
             ExcelOptions(mode="formatted", streaming=True)
