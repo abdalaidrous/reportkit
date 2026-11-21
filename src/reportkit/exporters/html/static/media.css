@@ -1,0 +1,10 @@
+.rk-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.rk-image--logo {
+    max-height: 90px;
+}

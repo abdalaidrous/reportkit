@@ -1,8 +1,11 @@
 from pathlib import Path
 
 from reportkit.components import Column, Heading, Report, Row, Section, Text
-from reportkit.components.layout import Divider, Grid, Spacer
-from reportkit.components.table import Table, TableColumn
+from reportkit.components.typography import RichText, TextSpan
+from reportkit.components.layout import Box, Divider, Grid, Spacer
+from reportkit.components.media import Image
+from reportkit.components.information import InfoGrid, KeyValue
+from reportkit.components.table import Table, TableCell, TableColumn, TableRow, TableStyle
 from reportkit.exporters.registry import ExporterRegistry
 from reportkit.rendering.context import RenderingContext
 from reportkit.styles.style import Style
@@ -31,6 +34,43 @@ def build_report():
     return Report(
         title="التقرير المالي",
         children=[
+            Image(
+                src="https://example.com/logo.png",
+                alt="Hotel Logo",
+                width="90",
+                height="90",
+            ),
+            Box(
+                style=Style(
+                    padding=20,
+                    background_color="#f8fafc",
+                    border_color="#e2e8f0",
+                    border_width=1,
+                    border_radius=8,
+                ),
+                children=[
+                    Heading(value="بيانات التقرير", level=3),
+                    Text(value="تقرير الحركة المالية"),
+                    Text(value="الفترة: 01/11/2026 - 20/11/2026"),
+                ],
+            ),
+            InfoGrid(
+                columns=2,
+                gap=12,
+                children=[
+                    KeyValue(label="من تاريخ", secondary_label="Date from", value="01/11/2026"),
+                    KeyValue(label="إلى تاريخ", secondary_label="Date to", value="20/11/2026"),
+                    KeyValue(label="اتجاه المعاملة", secondary_label="Direction", value="كلاهما"),
+                    KeyValue(label="عدد الحركات", secondary_label="Transactions", value="4"),
+                ],
+            ),
+            RichText(
+                spans=[
+                    TextSpan(value="دفعة للحجز رقم "),
+                    TextSpan(value="RES-A-000001", direction="ltr", style=Style(font_weight=700, color="#2563eb")),
+                    TextSpan(value=" بواسطة الصندوق الرئيسي"),
+                ],
+            ),
             Section(
                 style=Style(margin_bottom=32),
                 children=[
@@ -112,19 +152,41 @@ def build_report():
                 children=[
                     Heading(value="تفاصيل العمليات المالية", level=2),
                     Table(
+                        header="تقرير الحركة المالية حسب الحساب",
+                        table_style=TableStyle(
+                            bordered=True,
+                            striped=True,
+                            hover=True,
+                            compact=False,
+                            repeat_header=True,
+                        ),
                         columns=[
                             TableColumn(key="date", title="التاريخ", width="130px"),
-                            TableColumn(key="reference", title="رقم العملية"),
+                            TableColumn(key="reference", title="المرجع", width="130px"),
                             TableColumn(key="description", title="البيان"),
-                            TableColumn(key="type", title="النوع"),
-                            TableColumn(key="amount", title="المبلغ", align="end"),
+                            TableColumn(
+                                key="amount",
+                                title="المبلغ",
+                                width="160px",
+                                format="currency",
+                                currency="SAR",
+                                decimals=2,
+                                align="end",
+                            ),
                         ],
                         rows=[
-                            {"date": "2026-11-01", "reference": "REC-001", "description": "سند قبض نقدي", "type": "قبض", "amount": 5000},
-                            {"date": "2026-11-02", "reference": "PAY-001", "description": "مصروفات تشغيل", "type": "صرف", "amount": -2000},
-                            {"date": "2026-11-03", "reference": "REC-002", "description": "تحويل بنكي", "type": "قبض", "amount": 7000},
-                            {"date": "2026-11-04", "reference": "PAY-002", "description": "مصاريف صيانة", "type": "صرف", "amount": -1500},
+                            TableRow(kind="group-header", cells=[TableCell(value="البنك الأهلي", colspan=4, style=Style(font_weight=700))]),
+                            TableRow(values={"date": "2026-11-01", "reference": "REC-001", "description": "سند قبض", "amount": 5000}),
+                            TableRow(values={"date": "2026-11-02", "reference": "PAY-001", "description": "سند صرف", "amount": -2000}),
+                            TableRow(kind="subtotal", values={"date": "", "reference": "", "description": "إجمالي البنك", "amount": 3000}),
+                            TableRow(kind="group-header", cells=[TableCell(value="الصندوق الرئيسي", colspan=4, style=Style(font_weight=700))]),
+                            TableRow(values={"date": "2026-11-03", "reference": "REC-002", "description": "سند قبض نقدي", "amount": 4000}),
+                            TableRow(kind="subtotal", values={"date": "", "reference": "", "description": "إجمالي الصندوق", "amount": 4000}),
                         ],
+                        footer=TableRow(
+                            values={"date": "", "reference": "", "description": "الإجمالي العام", "amount": 7000},
+                            kind="total",
+                        ),
                     ),
                 ],
             ),

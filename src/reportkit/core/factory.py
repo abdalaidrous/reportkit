@@ -2,7 +2,8 @@ from collections.abc import Mapping
 from dataclasses import fields
 
 from ..styles.style import Style
-from .component import Component, Container
+from .component import Component
+from .container import Container
 from .registry import ComponentRegistry
 
 

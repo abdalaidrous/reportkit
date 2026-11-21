@@ -1,0 +1,9 @@
+<p class="rk-rich-text" style="text-align: {{ align }};{% if style %} {{ style }}{% endif %}">
+    {% for span in spans %}
+    <span
+        {% if span.language %}lang="{{ span.language }}"{% endif %}
+        {% if span.direction %}dir="{{ span.direction }}"{% endif %}
+        {% if span.style %}style="{{ span.style }}"{% endif %}
+    >{{ span.value }}</span>
+    {% endfor %}
+</p>

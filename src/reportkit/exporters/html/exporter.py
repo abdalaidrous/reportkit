@@ -2,6 +2,7 @@ from ...components.document import Report
 from ...rendering.context import RenderingContext
 from ..base import BaseExporter
 from .engine import HtmlRenderingEngine
+from .page_resolver import HtmlPageResolver
 
 
 class HtmlExporter(BaseExporter):
@@ -24,7 +25,8 @@ class HtmlExporter(BaseExporter):
 
         context = context if context is not None else RenderingContext()
         content = self.engine.render(document, context)
-        styles = self.engine.templates.load_styles()
+        page_css = HtmlPageResolver.resolve(document)
+        styles = self.engine.templates.load_styles() + "\n" + page_css
         html = self.engine.templates.render(
             "document.html",
             title=document.title,

@@ -1,0 +1,67 @@
+<div class="rk-table-container">
+    <table
+        class="rk-table
+        {% if table_style.bordered %}rk-table--bordered{% endif %}
+        {% if table_style.striped %}rk-table--striped{% endif %}
+        {% if table_style.hover %}rk-table--hover{% endif %}
+        {% if table_style.compact %}rk-table--compact{% endif %}
+        {% if table_style.repeat_header %}rk-table--repeat-header{% endif %}
+        {% if table_style.avoid_row_break %}rk-table--avoid-row-break{% endif %}"
+        {% if style %}style="{{ style }}"{% endif %}
+    >
+
+        {% if header %}
+        <caption class="rk-table-caption">{{ header }}</caption>
+        {% endif %}
+
+        <colgroup>
+            {% for column in columns %}
+            <col{% if column.width %} style="width: {{ column.width }}"{% endif %}>
+            {% endfor %}
+        </colgroup>
+
+        {% if table_style.show_header %}
+        <thead>
+            <tr>
+                {% for column in columns %}
+                <th scope="col" style="text-align: {{ column.header_align or column.align }}">
+                    {{ column.title }}
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        {% endif %}
+
+        <tbody>
+            {% for row in rows %}
+            <tr class="rk-table-{{ row.kind }}"{% if row.style %} style="{{ row.style }}"{% endif %}>
+                {% for cell in row.cells %}
+                <td
+                    {% if cell.colspan > 1 %}colspan="{{ cell.colspan }}"{% endif %}
+                    {% if cell.rowspan > 1 %}rowspan="{{ cell.rowspan }}"{% endif %}
+                    style="text-align: {{ cell.align }};{% if cell.style %} {{ cell.style }}{% endif %}"
+                >
+                    {{ cell.display }}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+
+        {% if footer %}
+        <tfoot>
+            <tr class="rk-table-total"{% if footer.style %} style="{{ footer.style }}"{% endif %}>
+                {% for cell in footer.cells %}
+                <td
+                    {% if cell.colspan > 1 %}colspan="{{ cell.colspan }}"{% endif %}
+                    {% if cell.rowspan > 1 %}rowspan="{{ cell.rowspan }}"{% endif %}
+                    style="text-align: {{ cell.align }};{% if cell.style %} {{ cell.style }}{% endif %}"
+                >
+                    {{ cell.display }}
+                </td>
+                {% endfor %}
+            </tr>
+        </tfoot>
+        {% endif %}
+    </table>
+</div>

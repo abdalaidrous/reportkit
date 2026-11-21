@@ -34,3 +34,21 @@
     font-weight: 600;
     color: var(--rk-color-muted);
 }
+
+.rk-rich-text {
+    margin: 0;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.rk-rich-text span {
+    unicode-bidi: isolate;
+}
+
+.rk-rich-text span[dir="rtl"] {
+    direction: rtl;
+}
+
+.rk-rich-text span[dir="ltr"] {
+    direction: ltr;
+}

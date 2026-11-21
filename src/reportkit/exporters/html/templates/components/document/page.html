@@ -1,0 +1,8 @@
+<section
+    class="rk-page"
+    data-page-size="{{ component.size }}"
+    data-page-orientation="{{ component.orientation }}"
+    {% if style %}style="{{ style }}"{% endif %}
+>
+    {{ children | safe }}
+</section>

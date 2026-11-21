@@ -1,9 +1,10 @@
-from .document import Report, Page, Header, Footer
-from .layout import Section, Row, Column, Grid, Spacer, Divider
-from .text import Text, Heading
-from .table import Table, TableColumn
-from .media import Image, Chart
-from .pagination import PageBreak, PageNumber, PageCount
+from .document import Footer, Header, Page, Report
+from .information import InfoGrid, KeyValue
+from .layout import Box, Column, Divider, Grid, Row, Section, Spacer
+from .media import Chart, Image
+from .pagination import PageBreak, PageCount, PageNumber
+from .table import Table, TableCell, TableColumn, TableRow, TableStyle
+from .typography import Heading, RichText, Text, TextSpan
 from ..core.registry import ComponentRegistry
 
 
@@ -13,6 +14,7 @@ COMPONENT_TYPES = {
     "header": Header,
     "footer": Footer,
     "section": Section,
+    "box": Box,
     "row": Row,
     "column": Column,
     "grid": Grid,
@@ -20,7 +22,10 @@ COMPONENT_TYPES = {
     "divider": Divider,
     "text": Text,
     "heading": Heading,
+    "rich_text": RichText,
     "table": Table,
+    "key_value": KeyValue,
+    "info_grid": InfoGrid,
     "image": Image,
     "chart": Chart,
     "page_break": PageBreak,
@@ -30,3 +35,11 @@ COMPONENT_TYPES = {
 
 for name, component in COMPONENT_TYPES.items():
     ComponentRegistry.register(name, component)
+
+__all__ = [
+    "Box", "Chart", "Column", "Divider", "Footer", "Grid", "Header",
+    "Heading", "Image", "InfoGrid", "KeyValue", "Page", "PageBreak",
+    "PageCount", "PageNumber", "Report", "Row", "Section", "Spacer",
+    "RichText", "Table", "TableCell", "TableColumn", "TableRow", "TableStyle",
+    "Text", "TextSpan",
+]

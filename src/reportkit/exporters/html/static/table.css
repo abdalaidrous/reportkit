@@ -8,8 +8,17 @@
 .rk-table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: auto;
     font-size: var(--rk-font-sm);
     text-align: start;
+}
+
+.rk-table-caption {
+    padding: 16px;
+    font-size: var(--rk-font-lg);
+    font-weight: 700;
+    text-align: start;
+    caption-side: top;
 }
 
 .rk-table thead {
@@ -30,6 +39,38 @@
     color: var(--rk-color-text);
 }
 
+.rk-table th,
+.rk-table td {
+    padding: 12px 16px;
+    vertical-align: middle;
+}
+
+.rk-table thead th {
+    background: var(--rk-color-subtle);
+    color: var(--rk-color-muted);
+    font-weight: 600;
+    border-bottom: 1px solid var(--rk-color-border);
+}
+
+.rk-table--bordered th,
+.rk-table--bordered td {
+    border: 1px solid var(--rk-color-border);
+}
+
+.rk-table--striped tbody tr:nth-child(even):not(.rk-table-group-header):not(.rk-table-subtotal):not(.rk-table-total) {
+    background: #f8fafc;
+}
+
+.rk-table--hover tbody tr:hover {
+    background: #f1f5f9;
+}
+
+.rk-table--compact th,
+.rk-table--compact td {
+    padding: 6px 10px;
+    font-size: 12px;
+}
+
 .rk-table tbody tr:last-child td {
     border-bottom: 0;
 }
@@ -40,6 +81,36 @@
 
 .rk-table tbody tr:hover {
     background: var(--rk-color-subtle);
+}
+
+.rk-table tfoot {
+    background: var(--rk-color-subtle);
+}
+
+.rk-table-total td {
+    padding: 16px;
+    font-weight: 700;
+    border-top: 2px solid var(--rk-color-border);
+    border-bottom: 0;
+}
+
+.rk-table-subtotal {
+    background: #f1f5f9;
+    font-weight: 600;
+}
+
+.rk-table-subtotal td {
+    border-top: 1px solid var(--rk-color-border);
+}
+
+.rk-table-total {
+    background: #e2e8f0;
+    font-weight: 700;
+}
+
+.rk-table-group-header {
+    background: #e2e8f0;
+    font-weight: 700;
 }
 
 @media print {
@@ -53,5 +124,9 @@
 
     .rk-table tr {
         break-inside: avoid;
+    }
+
+    .rk-table tfoot {
+        display: table-footer-group;
     }
 }

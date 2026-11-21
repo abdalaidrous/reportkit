@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
-from ..core.component import Component, Container
+from ..core.component import Component
+from ..core.container import Container
 from ..core.registry import ComponentRegistry
 from .context import RenderingContext
 

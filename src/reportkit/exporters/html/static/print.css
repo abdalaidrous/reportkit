@@ -3,6 +3,26 @@
     margin: 15mm;
 }
 
+.rk-page {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+}
+
+.rk-page-break {
+    display: none;
+}
+
+.rk-header {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.rk-footer {
+    width: 100%;
+    box-sizing: border-box;
+}
+
 @media print {
     html,
     body {
@@ -27,5 +47,63 @@
 
     .rk-no-print {
         display: none !important;
+    }
+
+    .rk-table-container {
+        overflow: visible;
+        border: 0;
+    }
+
+    .rk-table {
+        width: 100%;
+    }
+
+    .rk-table--repeat-header thead {
+        display: table-header-group;
+    }
+
+    .rk-table--avoid-row-break tbody tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .rk-table tfoot {
+        display: table-row-group;
+    }
+
+    .rk-table-group-header {
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+
+    .rk-table-caption {
+        break-after: avoid;
+    }
+
+    .rk-page {
+        break-after: page;
+        page-break-after: always;
+    }
+
+    .rk-page:last-child {
+        break-after: auto;
+        page-break-after: auto;
+    }
+
+    .rk-page-break {
+        display: block;
+        break-before: page;
+        page-break-before: always;
+    }
+
+    .rk-page-number {
+        font-size: 11px;
+        color: #64748b;
+    }
+
+    .rk-header,
+    .rk-footer {
+        break-inside: avoid;
+        page-break-inside: avoid;
     }
 }
