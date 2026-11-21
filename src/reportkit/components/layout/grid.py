@@ -5,6 +5,6 @@ from ...core.container import Container
 
 @dataclass
 class Grid(Container):
-    """Arrange child components in a grid."""
+    """Arrange child components in a configurable grid."""
 
-    columns: int = 1
+    columns: int | str = 1
