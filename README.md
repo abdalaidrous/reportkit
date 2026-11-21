@@ -88,6 +88,24 @@ The PDF is rendered from the same HTML and CSS. Only embedded images (`data:` UR
 `base_url` folder are loaded; network resources are refused, and any resource that cannot be loaded fails the export
 instead of producing an incomplete PDF.
 
+Large reports (tens of thousands of rows) are laid out in chunks of about `chunk_rows` table rows and merged with
+pypdf, so memory stays bounded by one chunk instead of growing with the report. Rows may be a lazy iterator (for
+example a database cursor); they are read as the chunks need them and never all kept in memory. Totals and other
+aggregates must be passed already computed (for example as the table `footer`). `export_to` writes to a file path or a
+binary stream:
+
+```python
+from reportkit.exporters.pdf import PdfExporter, PdfOptions
+
+PdfExporter.export_to(report, "report.pdf", context)                                    # default: 500-row chunks
+PdfExporter.export_to(report, stream, context, options=PdfOptions(chunk_rows=None))     # one pass, as before
+```
+
+Each chunk ends at a real page break, so pages break where a single-pass layout breaks them. Only tables placed directly
+in a `Page` (or the `Report`) are split; the column widths of a split table are measured on its first chunk and kept
+for the rest, and page numbers are stamped after merging. Layout time is still about the same per row (WeasyPrint);
+what chunking removes is the memory growth.
+
 ### Excel
 
 ```python

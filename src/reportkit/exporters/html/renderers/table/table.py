@@ -25,7 +25,7 @@ class TableRenderer(BaseHtmlRenderer):
         rows = self.prepare_rows(component, context, engine)
         footer = self.prepare_row(component.footer, component.columns, context, engine) if component.footer else None
         header = [self.prepare_header(column) for column in component.columns]
-        return engine.templates.render(self.template_name, container_class=self.get_container_class(component.table_style), table_class=self.get_class(component.table_style), columns=component.columns, header=header, caption=component.header, rows=rows, footer=footer, show_header=component.table_style.show_header, style=style)
+        return engine.templates.render(self.template_name, container_class=self.container_class(component), table_class=self.get_class(component.table_style), columns=component.columns, header=header, caption=component.header, rows=rows, footer=footer, show_header=component.table_style.show_header, style=style)
 
     def prepare_rows(self, component, context, engine):
         """
@@ -44,6 +44,12 @@ class TableRenderer(BaseHtmlRenderer):
         else:
             cells = [self.cells.render(row.values.get(column.key), column, context, engine) for column in columns]
         return {"css_class": f"rk-table-row rk-table-{row.kind}", "style": engine.styles.resolve(row.style), "cells": cells}
+
+    def container_class(self, component):
+        """
+        Get the CSS classes of this table's container; subclasses may add their own.
+        """
+        return self.get_container_class(component.table_style)
 
     @staticmethod
     def prepare_header(column):

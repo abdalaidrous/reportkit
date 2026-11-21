@@ -94,3 +94,16 @@
 .rk-grid--rtl.rk-grid--cols-12 > :nth-child(12n+10) { grid-column: 3; }
 .rk-grid--rtl.rk-grid--cols-12 > :nth-child(12n+11) { grid-column: 2; }
 .rk-grid--rtl.rk-grid--cols-12 > :nth-child(12n+12) { grid-column: 1; }
+
+/*
+ * Large reports are laid out in chunks that stop inside a table. A fragment continued from the previous chunk starts
+ * like a table resumed on a new page, where WeasyPrint slices the start decoration of the box away.
+ */
+.rk-pdf-fragment--continued,
+.rk-pdf-fragment--continued > .rk-table {
+    margin-top: 0;
+    padding-top: 0;
+    border-top-width: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}

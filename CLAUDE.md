@@ -148,7 +148,10 @@ reportkit/
 │       │   ├── templates/        # قوالب Jinja2 (table.html + cell.html مشترك بين tbody وtfoot)
 │       │   └── static/           # tokens, layout, table, print...
 │       ├── pdf/
-│       │   ├── exporter.py       # PdfExporter: HtmlExporter ثم PdfConversionService فقط
+│       │   ├── exporter.py       # PdfExporter: export (bytes) و export_to (مسار/stream)؛ مسار واحد أو أجزاء
+│       │   ├── options.py        # PdfOptions(chunk_rows=500 أو None)
+│       │   ├── chunking/         # flow (صفوف كسولة) → planner (الجزء التالي) → html → layout (قراءة صناديق WeasyPrint) → renderer
+│       │   ├── assembly/         # merger.py (pypdf) و numbering.py (طبقة أرقام الصفحات بعد الدمج)
 │       │   ├── conversion.py     # PdfConversionService + WeasyPrintErrorMonitor (مراقبة لكل thread)
 │       │   ├── dependencies.py   # تحميل WeasyPrint الاختياري
 │       │   ├── exceptions.py     # PdfExportError
@@ -193,6 +196,9 @@ with open("report.pdf", "wb") as file:              # الحفظ مسؤولية 
 ```
 
 - WeasyPrint اعتماد اختياري: `pip install -e ".[pdf]"`، ويحتاج مكتبات Pango في النظام. عند غيابه يُرفع `ImportError` برسالة واضحة.
+- التقارير الضخمة: `PdfOptions(chunk_rows=500)` افتراضيًا. الجداول المباشرة داخل `Page` (أو `Report`) تُقسَّم إلى أجزاء؛ كل جزء تقرير صغير يُخطط بـ WeasyPrint وتُحذف صفحته الأخيرة غير المكتملة وتُعاد صفوفها مع الجزء التالي، فتنكسر الصفحات كما في المسار الواحد. عرض الأعمدة يُقاس من الجزء الأول ويُثبت (`TableFragment` + `width` بالـ px)، و`rk-pdf-fragment--continued` في `pdf.css` يحاكي استئناف الجدول في صفحة جديدة. الترقيم يُختم بعد الدمج بطبقة شفافة (`string-set`). التقرير الذي يتسع في جزء واحد يُخطط مرة واحدة كما كان.
+- pypdf ضمن `[pdf]`؛ بدونه يُطلق تحذير ويُستخدم المسار الواحد. الصفوف تُقرأ كسولًا ولا تُحمّل كلها، والإجماليات تأتي جاهزة من التطبيق.
+- `export_to(document, target)` يكتب إلى مسار أو stream ثنائي.
 - الموارد: الصور المحلية تُضمَّن كـ data URI عبر `AssetResolver`. أثناء التحويل يُسمح فقط بـ `data:`، وبملفات داخل `base_url` إن مُرِّر؛ الشبكة وبقية الملفات المحلية تُمنع ويُرفع `PdfExportError` مع السبب الأصلي.
 - Header/Footer المتكرر (`repeat=True`) يجب أن يأتي قبل المحتوى في الشجرة حتى يظهر من الصفحة الأولى (سلوك running elements في CSS).
 - على Windows تُشغَّل اختبارات PDF عبر Docker:

@@ -33,6 +33,7 @@ dependencies = [
 [project.optional-dependencies]
 pdf = [
     "weasyprint>=70",
+    "pypdf>=4",
 ]
 excel = [
     "openpyxl>=3.1",
@@ -43,6 +44,7 @@ word = [
 ]
 all = [
     "weasyprint>=70",
+    "pypdf>=4",
     "openpyxl>=3.1",
     "pillow>=10",
     "python-docx>=1.1",

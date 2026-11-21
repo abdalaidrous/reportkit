@@ -25,14 +25,12 @@ class HtmlExporter(BaseExporter):
 
         context = context if context is not None else RenderingContext()
         content = self.engine.render(document, context)
-        page_css = HtmlPageResolver.resolve(document)
-        styles = self.engine.templates.load_styles() + "\n" + page_css
-        html = self.engine.templates.render(
-            "document.html",
-            title=document.title,
-            language=context.language,
-            direction=context.direction,
-            content=content,
-            styles=styles,
-        )
+        styles = self.engine.templates.load_styles() + "\n" + self.page_styles(document)
+        html = self.engine.templates.render("document.html", title=document.title, language=context.language, direction=context.direction, content=content, styles=styles)
         return html.encode("utf-8")
+
+    def page_styles(self, document):
+        """
+        Return the print CSS of the report pages.
+        """
+        return HtmlPageResolver.resolve(document)
