@@ -1,15 +1,33 @@
 [build-system]
-requires = ["setuptools>=61"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "reportkit"
+# The distribution is "pyreportkit"; the import name is "reportkit".
+name = "pyreportkit"
 version = "0.1.0"
-description = "A Python library for building report documents."
+description = "Build bilingual (Arabic/English, RTL/LTR) reports from reusable components and export them to HTML, PDF, Excel and Word."
 readme = "README.md"
 requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Abdullah Alaidrous" }]
+keywords = ["report", "reporting", "pdf", "excel", "xlsx", "docx", "html", "arabic", "rtl"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Natural Language :: Arabic",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business",
+    "Topic :: Text Processing :: Markup :: HTML",
+]
 dependencies = [
-    "Jinja2==3.1.6",
+    "Jinja2>=3.1",
 ]
 
 [project.optional-dependencies]
@@ -23,9 +41,20 @@ excel = [
 word = [
     "python-docx>=1.1",
 ]
+all = [
+    "weasyprint>=70",
+    "openpyxl>=3.1",
+    "pillow>=10",
+    "python-docx>=1.1",
+]
 test = [
     "pytest>=8",
 ]
+
+[project.urls]
+Homepage = "https://github.com/abdalaidrous/reportkit"
+Repository = "https://github.com/abdalaidrous/reportkit"
+Issues = "https://github.com/abdalaidrous/reportkit/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

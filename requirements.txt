@@ -1,1 +1,2 @@
-Jinja2==3.1.6
+# Core runtime dependency (HTML export). Keep in sync with [project.dependencies] in pyproject.toml.
+Jinja2>=3.1

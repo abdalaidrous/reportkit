@@ -1,0 +1,146 @@
+# ReportKit
+
+Build reports from reusable components and export the same report to **HTML**, **PDF**, **Excel (XLSX)** and **Word (DOCX)**.
+ReportKit is built for bilingual Arabic/English documents: right-to-left and left-to-right text, mixed-direction values
+and RTL tables are handled in every format.
+
+ReportKit is a presentation library. Your application prepares the rows, totals and summaries; ReportKit only lays them
+out, styles them and exports them. It never computes or aggregates report data.
+
+## Installation
+
+```bash
+pip install pyreportkit           # HTML export
+pip install "pyreportkit[pdf]"    # + PDF (WeasyPrint)
+pip install "pyreportkit[excel]"  # + Excel (openpyxl, Pillow)
+pip install "pyreportkit[word]"   # + Word (python-docx)
+pip install "pyreportkit[all]"    # every exporter
+```
+
+PDF export uses [WeasyPrint](https://doc.courtbouillon.org/weasyprint/stable/first_steps.html), which needs the Pango
+system libraries (`apt install libpango-1.0-0 libpangoft2-1.0-0` on Debian/Ubuntu). On Windows, the simplest option is
+the provided `Dockerfile`.
+
+Requires Python 3.10 or newer.
+
+## Quick start
+
+```python
+from reportkit.components.document import Page, Report
+from reportkit.components.layout import Grid
+from reportkit.components.table import Table, TableCell, TableColumn, TableRow
+from reportkit.components.typography import Heading, Text
+from reportkit.rendering.context import RenderingContext
+from reportkit.styles.style import Style
+
+report = Report(title="Financial Movement Report", children=[
+    Page(size="A4", orientation="portrait", page_number_position="bottom-center", children=[
+        Grid(columns="1fr 1fr", children=[
+            Heading(value="تقرير الحركة المالية", level=2, style=Style(text_align="right")),
+            Text(value="Financial Movement Report", style=Style(text_align="left")),
+        ]),
+        Table(
+            columns=[
+                TableColumn(key="voucher", title="رقم السند", subtitle="Voucher No."),
+                TableColumn(key="date", title="التاريخ", subtitle="Date"),
+                TableColumn(key="amount", title="المبلغ", subtitle="Amount", format="number"),
+            ],
+            rows=[
+                TableRow(values={
+                    "voucher": "000004",
+                    "date": TableCell(children=[Text(value="14/11/2026"), Text(value="12:47 AM", style=Style(font_size=9, color="#777777"))]),
+                    "amount": 200,
+                }),
+            ],
+            footer=TableRow(values={"voucher": "الإجمالي", "amount": 200}, kind="total"),
+        ),
+    ]),
+])
+
+context = RenderingContext(language="ar", direction="rtl")
+```
+
+Rows can be any iterable, including generators and database cursors: they are read one at a time and never loaded into
+a list.
+
+## Exporting
+
+Every exporter returns `bytes`; saving or sending them is up to your application.
+
+### HTML
+
+```python
+import reportkit.exporters.html
+from reportkit.exporters.html.exporter import HtmlExporter
+
+html = HtmlExporter().export(report, context)
+```
+
+### PDF
+
+```python
+from reportkit.exporters.pdf import PdfExporter
+
+pdf = PdfExporter.export(report, context)
+```
+
+The PDF is rendered from the same HTML and CSS. Only embedded images (`data:` URIs) and files inside an optional
+`base_url` folder are loaded; network resources are refused, and any resource that cannot be loaded fails the export
+instead of producing an incomplete PDF.
+
+### Excel
+
+```python
+from reportkit.exporters.excel import ExcelExporter, ExcelOptions
+
+xlsx = ExcelExporter().export(report, context)                                              # looks like the PDF
+xlsx = ExcelExporter().export(report, context, ExcelOptions(mode="data", streaming=True))   # one typed sheet per table
+```
+
+- `formatted` (default): one printable sheet with merged cells, colors, borders, logo, RTL and print settings.
+- `data`: analysis-ready sheets with real numbers and dates, frozen headers and AutoFilter. With `streaming=True` memory
+  stays flat, which is the right choice for very large reports.
+- Values are written as they arrive: no formulas, text is always stored as text (formula injection safe), and decimals
+  beyond Excel's 15 significant digits raise an error unless `decimal_policy="text"`.
+
+### Word
+
+```python
+from reportkit.exporters.word import WordExporter
+
+docx = WordExporter().export(report, context)
+```
+
+Tables repeat their header row on every page, repeating headers and footers go to the Word page header and footer, and
+page numbers use Word's PAGE and NUMPAGES fields.
+
+### Exporter registry
+
+```python
+import reportkit.exporters.html, reportkit.exporters.pdf, reportkit.exporters.excel, reportkit.exporters.word
+from reportkit.exporters.registry import ExporterRegistry
+
+exporter = ExporterRegistry.get("xlsx")()   # "html", "pdf", "excel"/"xlsx", "word"/"docx"
+```
+
+## Components
+
+| Group | Components |
+|---|---|
+| Document | `Report`, `Page`, `Header`, `Footer` |
+| Layout | `Box`, `Section`, `Row`, `Column`, `Grid`, `Spacer`, `Divider` |
+| Typography | `Text`, `Heading`, `RichText`, `TextSpan` |
+| Tables | `Table`, `TableColumn`, `TableRow`, `TableCell`, `TableStyle` |
+| Information | `KeyValue`, `InfoGrid` |
+| Media | `Image` |
+| Pagination | `PageBreak`, `PageNumber` |
+
+Styles are immutable `Style` objects; table colors and spacing come from CSS design tokens shared by every exporter.
+
+## Development
+
+```bash
+pip install -r requirements-dev.txt
+python -m pytest tests
+docker build -t reportkit . && docker run --rm reportkit   # full suite, including PDF
+```
