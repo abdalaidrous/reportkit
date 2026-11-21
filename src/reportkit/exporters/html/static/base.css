@@ -17,9 +17,9 @@ body {
 }
 
 .rk-report {
-    max-width: 1120px;
-    margin: 32px auto;
-    padding: var(--rk-space-7);
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 0;
     background: var(--rk-color-surface);
     border: 1px solid var(--rk-color-border);
     border-radius: var(--rk-radius-lg);
