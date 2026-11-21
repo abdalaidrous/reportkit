@@ -15,6 +15,7 @@ class Chunk:
     position: tuple | None = None
     stream: object = None
     running: list = field(default_factory=list)
+    rows: int = 0
 
     @property
     def final(self):
@@ -34,8 +35,8 @@ class ChunkPlanner:
         """
         Collect children from the flow position; planning never moves the flow, so a chunk can be planned again.
         """
-        parts, running, position, stream = cls.collect(flow, limit)
-        return Chunk(cls.build(flow, parts), position, stream, running)
+        parts, running, position, stream, rows = cls.collect(flow, limit)
+        return Chunk(cls.build(flow, parts), position, stream, running, rows)
 
     @classmethod
     def collect(cls, flow, limit):
@@ -51,17 +52,18 @@ class ChunkPlanner:
             parts.append((segment, children))
 
             start = first_child if segment_index == first_segment else 0
-            rows, position, stream = cls.collect_segment(flow, segment_index, start, children, running, rows, limit)
+            rows, position, stream, taken = cls.collect_segment(flow, segment_index, start, children, running, rows, limit)
 
             if position is not None:
-                return parts, running, position, stream
+                return parts, running, position, stream, taken
 
-        return parts, running, None, None
+        return parts, running, None, None, 0
 
     @classmethod
     def collect_segment(cls, flow, segment_index, start, children, running, rows, limit):
         """
-        Collect children from one segment, stopping when a table has more rows.
+        Collect children from one segment, stopping when a table has more rows; returns the rows so far, and the
+        open table's position, stream and fragment row count.
         """
         segment = flow.segments[segment_index]
 
@@ -78,9 +80,9 @@ class ChunkPlanner:
             rows += len(taken)
 
             if more:
-                return rows, position, stream
+                return rows, position, stream, len(taken)
 
-        return rows, None, None
+        return rows, None, None, 0
 
     @staticmethod
     def append_child(child, children, running):

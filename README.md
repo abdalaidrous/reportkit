@@ -106,6 +106,11 @@ in a `Page` (or the `Report`) are split; the column widths of a split table are 
 for the rest, and page numbers are stamped after merging. Layout time is still about the same per row (WeasyPrint);
 what chunking removes is the memory growth.
 
+`PdfOptions(workers=8)` lays chunks out in parallel processes (10,000 rows: about 3 minutes instead of 13). Each chunk
+then ends on its own last page, so a page at each chunk boundary is only partly filled, and each worker needs about as
+much memory as one chunk (about 0.5 GB for 500 rows). On Windows and macOS the calling script must be guarded with
+`if __name__ == "__main__":`, as for any `multiprocessing` code.
+
 ### Excel
 
 ```python

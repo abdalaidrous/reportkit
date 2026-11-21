@@ -7,7 +7,7 @@ from ...rendering.context import RenderingContext
 from ..base import BaseExporter
 from ..html.exporter import HtmlExporter
 from .assembly import PageNumberOverlay, PdfMerger
-from .chunking import ChunkedPdfRenderer
+from .chunking import ChunkedPdfRenderer, ParallelPdfRenderer
 from .conversion import PdfConversionService
 from .dependencies import PYPDF_HELP, load_pypdf
 from .options import PdfOptions
@@ -40,7 +40,7 @@ class PdfExporter(BaseExporter):
         if options.chunk_rows is None or not cls.can_merge():
             return cls.export_single(document, target, context, base_url)
 
-        return cls.export_chunked(document, target, context, base_url, options.chunk_rows)
+        return cls.export_chunked(document, target, context, base_url, options)
 
     @staticmethod
     def validate(document):
@@ -59,11 +59,11 @@ class PdfExporter(BaseExporter):
         return cls.write(target, PdfConversionService.convert(html, base_url))
 
     @classmethod
-    def export_chunked(cls, document, target, context, base_url, chunk_rows):
+    def export_chunked(cls, document, target, context, base_url, options):
         """
         Lay the report out in chunks and merge their PDFs unless the whole report fits in the first chunk.
         """
-        renderer = ChunkedPdfRenderer(document, context, base_url, chunk_rows)
+        renderer = cls.renderer(document, context, base_url, options)
         chunks = renderer.chunks()
         first = next(chunks)
 
@@ -73,6 +73,16 @@ class PdfExporter(BaseExporter):
         merger = cls.merge_chunks(first, chunks)
         cls.apply_numbering(merger, document, context)
         merger.write(target)
+
+    @staticmethod
+    def renderer(document, context, base_url, options):
+        """
+        Choose the exact sequential layout, or the parallel one when more than one worker is requested.
+        """
+        if options.workers > 1:
+            return ParallelPdfRenderer(document, context, base_url, options.chunk_rows, options.workers)
+
+        return ChunkedPdfRenderer(document, context, base_url, options.chunk_rows)
 
     @staticmethod
     def merge_chunks(first, chunks):

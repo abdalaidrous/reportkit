@@ -7,6 +7,7 @@ from ...html.renderers.table import TableRenderer
 
 FRAGMENT_CLASS = "rk-pdf-fragment"
 CONTINUED_CLASS = "rk-pdf-fragment--continued"
+CONTINUES_CLASS = "rk-pdf-fragment--continues"
 
 
 @dataclass(kw_only=True)
@@ -16,6 +17,7 @@ class TableFragment(Table):
     """
 
     continued: bool = False
+    continues: bool = False
 
     @classmethod
     def of(cls, table, rows, continued, last, widths=None):
@@ -27,7 +29,7 @@ class TableFragment(Table):
         cls.apply_header(values, table, continued)
         cls.apply_columns(values, table, widths)
         cls.apply_content(values, table, rows, continued, last)
-        return cls(**values, continued=continued)
+        return cls(**values, continued=continued, continues=not last)
 
     @staticmethod
     def table_values(table):
@@ -73,6 +75,9 @@ class TableFragmentRenderer(TableRenderer):
 
         if component.continued:
             classes.append(CONTINUED_CLASS)
+
+        if component.continues:
+            classes.append(CONTINUES_CLASS)
 
         return " ".join(classes)
 

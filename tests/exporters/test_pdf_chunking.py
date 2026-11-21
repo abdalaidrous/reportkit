@@ -48,6 +48,14 @@ class PdfOptionsTests(unittest.TestCase):
             with self.assertRaises(PdfExportError):
                 PdfOptions(chunk_rows=invalid)
 
+    def test_workers_must_be_positive_and_need_chunks(self):
+        self.assertEqual(PdfOptions(workers=4).workers, 4)
+        for invalid in (0, -2, 1.5, True):
+            with self.assertRaises(PdfExportError):
+                PdfOptions(workers=invalid)
+        with self.assertRaises(PdfExportError):
+            PdfOptions(chunk_rows=None, workers=2)
+
 
 class RowStreamTests(unittest.TestCase):
 
@@ -160,6 +168,16 @@ class ChunkedPdfExportTests(unittest.TestCase):
         pdf = PdfExporter.export(self.build(counted_rows(160, read)), options=PdfOptions(chunk_rows=40))
         self.assertEqual(read, list(range(160)))
         self.assertIn("row 159", "".join(self.texts(pdf)))
+
+    def test_parallel_workers_keep_every_row_once(self):
+        read = []
+        texts = self.texts(PdfExporter.export(self.build(counted_rows(160, read)), options=PdfOptions(chunk_rows=40, workers=2)))
+        text = " ".join(texts)
+        self.assertEqual(read, list(range(160)))
+        for index in (0, 39, 40, 159):
+            self.assertEqual(text.count(f"row {index}"), 1, index)  # No row is lost or laid out twice.
+        self.assertIn(f"Page {len(texts)} of {len(texts)}", texts[-1])
+        self.assertIn("Closing note", texts[-1])
 
     def test_export_to_path_and_stream(self):
         with tempfile.TemporaryDirectory() as folder:

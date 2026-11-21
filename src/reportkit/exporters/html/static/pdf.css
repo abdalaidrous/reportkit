@@ -97,7 +97,8 @@
 
 /*
  * Large reports are laid out in chunks that stop inside a table. A fragment continued from the previous chunk starts
- * like a table resumed on a new page, where WeasyPrint slices the start decoration of the box away.
+ * like a table resumed on a new page, where WeasyPrint slices the start decoration of the box away; a fragment the
+ * next chunk continues ends like a table split by a page break (parallel layout keeps that last page).
  */
 .rk-pdf-fragment--continued,
 .rk-pdf-fragment--continued > .rk-table {
@@ -106,4 +107,17 @@
     border-top-width: 0;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+}
+
+.rk-pdf-fragment--continues,
+.rk-pdf-fragment--continues > .rk-table {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom-width: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.rk-pdf-fragment--continues .rk-table tbody tr:last-child td {
+    border-bottom: 1px solid var(--rk-table-divider-color);
 }
