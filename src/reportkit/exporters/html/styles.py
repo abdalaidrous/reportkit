@@ -55,6 +55,10 @@ class HtmlStyleResolver:
         "border_color": "border-color",
         "border_style": "border-style",
         "border_radius": "border-radius",
+        "border_top": "border-top",
+        "border_right": "border-right",
+        "border_bottom": "border-bottom",
+        "border_left": "border-left",
         "box_shadow": "box-shadow",
         "overflow": "overflow",
     }
@@ -84,6 +88,8 @@ class HtmlStyleResolver:
         "border_width",
         "border_radius",
     }
+
+    SHORTHANDS = {"padding", "padding_top", "padding_right", "padding_bottom", "padding_left", "margin", "margin_top", "margin_right", "margin_bottom", "margin_left"}
 
     KEYWORDS = {
         "font_style": {"normal", "italic", "oblique"},
@@ -148,6 +154,8 @@ class HtmlStyleResolver:
             raise ValueError(f"Invalid CSS value for '{name}'.")
 
         if name in self.DIMENSIONS and not self.DIMENSION_VALUE.fullmatch(value):
+            if name in self.SHORTHANDS and all(self.DIMENSION_VALUE.fullmatch(part) for part in value.split()):
+                return value
             raise ValueError(f"Invalid CSS value for '{name}'.")
 
         return value

@@ -71,6 +71,10 @@ class Style:
     border_color: str | None = None
     border_style: str | None = None
     border_radius: float | None = None
+    border_top: str | None = None
+    border_right: str | None = None
+    border_bottom: str | None = None
+    border_left: str | None = None
 
     # Effects
     box_shadow: str | None = None
