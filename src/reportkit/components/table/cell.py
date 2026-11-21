@@ -8,7 +8,10 @@ from ...validators.table.cell import TableCellValidator
 
 @dataclass(frozen=True, kw_only=True)
 class TableCell:
-    """Define one prepared cell: a plain value or a stack of child components; align=None inherits the column."""
+    """
+    Define one prepared cell: a plain value or a stack of child components; align=None inherits the
+    column.
+    """
 
     value: Any = None
     children: list[Component] = field(default_factory=list)
@@ -18,5 +21,7 @@ class TableCell:
     style: Style = field(default_factory=Style)
 
     def __post_init__(self):
-        """Validate the cell definition."""
+        """
+        Validate the cell definition.
+        """
         TableCellValidator.validate(self)

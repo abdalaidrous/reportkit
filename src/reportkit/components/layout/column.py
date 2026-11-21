@@ -5,7 +5,9 @@ from ...core.container import Container
 
 @dataclass
 class Column(Container):
-    """Arrange child components vertically."""
+    """
+    Arrange child components vertically.
+    """
 
     align: str | None = None
     justify: str | None = None

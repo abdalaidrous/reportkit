@@ -7,11 +7,15 @@ from .validator import HtmlPageValidator
 
 
 class HtmlPageResolver:
-    """Coordinate building the print CSS of a report."""
+    """
+    Coordinate building the print CSS of a report.
+    """
 
     @classmethod
     def resolve(cls, document):
-        """Return the print stylesheet for the report pages."""
+        """
+        Return the print stylesheet for the report pages.
+        """
         found = HtmlPageComponentFinder.find(document)
         if not found.pages:
             return ""
@@ -22,7 +26,9 @@ class HtmlPageResolver:
 
     @staticmethod
     def margins(page, found):
-        """Register the page number and running elements in the page margins."""
+        """
+        Register the page number and running elements in the page margins.
+        """
         margins = PageMarginRegistry()
         if found.numbers:
             margins.register(page.page_number_position, PageNumberStyleResolver.resolve(found.numbers[0].format), PageNumberStyleResolver.DECLARATIONS)

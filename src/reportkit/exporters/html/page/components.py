@@ -6,7 +6,9 @@ from ....components.pagination import PageNumber
 
 @dataclass
 class PageComponents:
-    """Hold the components that affect print CSS."""
+    """
+    Hold the components that affect print CSS.
+    """
 
     pages: list = field(default_factory=list)
     numbers: list = field(default_factory=list)
@@ -14,18 +16,24 @@ class PageComponents:
 
 
 class HtmlPageComponentFinder:
-    """Collect pages, page numbers and repeating headers/footers in one tree walk."""
+    """
+    Collect pages, page numbers and repeating headers/footers in one tree walk.
+    """
 
     @classmethod
     def find(cls, document):
-        """Walk the document once and return the collected components."""
+        """
+        Walk the document once and return the collected components.
+        """
         found = PageComponents()
         cls.collect(document, found)
         return found
 
     @classmethod
     def collect(cls, component, found):
-        """Collect one component, then its children."""
+        """
+        Collect one component, then its children.
+        """
         if isinstance(component, Page):
             found.pages.append(component)
 

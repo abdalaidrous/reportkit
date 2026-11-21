@@ -5,4 +5,6 @@ from ...core.container import Container
 
 @dataclass
 class Section(Container):
-    """Group related report components."""
+    """
+    Group related report components.
+    """

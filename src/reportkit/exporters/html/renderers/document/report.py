@@ -2,11 +2,15 @@ from ..base import BaseHtmlRenderer
 
 
 class ReportRenderer(BaseHtmlRenderer):
-    """Render the root report container."""
+    """
+    Render the root report container.
+    """
 
     template_name = "components/document/report.html"
 
     def render(self, component, context, engine):
-        """Render the report and all nested components."""
+        """
+        Render the report and all nested components.
+        """
         children = self.render_children(component, context, engine)
         return engine.templates.render(self.template_name, children=children)

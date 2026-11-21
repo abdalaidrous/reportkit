@@ -5,4 +5,6 @@ from ...core.component import Component
 
 @dataclass(kw_only=True)
 class PageBreak(Component):
-    """Insert a page break before the next content."""
+    """
+    Insert a page break before the next content.
+    """

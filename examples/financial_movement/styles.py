@@ -1,4 +1,6 @@
-"""Visual tokens for the reference financial movement report."""
+"""
+Visual tokens for the reference financial movement report.
+"""
 
 from reportkit.styles.style import Style
 

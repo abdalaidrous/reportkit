@@ -1,1 +1,3 @@
-"""Table validators; import the concrete modules directly to avoid circular imports."""
+"""
+Table validators; import the concrete modules directly to avoid circular imports.
+"""

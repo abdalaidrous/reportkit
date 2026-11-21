@@ -7,7 +7,9 @@ from ...styles.style import Style
 
 @dataclass(kw_only=True)
 class KeyValue(Component):
-    """Represent a labeled value."""
+    """
+    Represent a labeled value.
+    """
 
     label: str
     value: Any = None
@@ -17,7 +19,9 @@ class KeyValue(Component):
     value_style: Style = field(default_factory=Style)
 
     def __post_init__(self):
-        """Validate the information field."""
+        """
+        Validate the information field.
+        """
         if not isinstance(self.label, str):
             raise TypeError("Label must be a string.")
         if self.orientation not in {"horizontal", "vertical"}:

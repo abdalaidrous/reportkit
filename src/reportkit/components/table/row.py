@@ -9,7 +9,9 @@ from .cell import TableCell
 
 @dataclass(frozen=True, kw_only=True)
 class TableRow:
-    """Define one prepared row; values may hold plain values or TableCell instances."""
+    """
+    Define one prepared row; values may hold plain values or TableCell instances.
+    """
 
     values: Mapping[str, Any] = field(default_factory=dict)
     kind: str = "data"
@@ -17,5 +19,7 @@ class TableRow:
     style: Style = field(default_factory=Style)
 
     def __post_init__(self):
-        """Validate the row definition."""
+        """
+        Validate the row definition.
+        """
         TableRowValidator.validate(self)

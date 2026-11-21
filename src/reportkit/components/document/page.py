@@ -5,7 +5,9 @@ from ...core.container import Container
 
 @dataclass(kw_only=True)
 class Page(Container):
-    """Define a report page and its print settings; the HTML exporter validates them in HtmlPageValidator."""
+    """
+    Define a report page and its print settings; the HTML exporter validates them in HtmlPageValidator.
+    """
 
     size: str = "A4"
     orientation: str = "portrait"

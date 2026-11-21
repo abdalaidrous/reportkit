@@ -6,13 +6,17 @@ from .text_span import TextSpan
 
 @dataclass(kw_only=True)
 class RichText(Component):
-    """Represent text containing multiple styled fragments."""
+    """
+    Represent text containing multiple styled fragments.
+    """
 
     spans: list[TextSpan] = field(default_factory=list)
     align: str = "start"
 
     def __post_init__(self):
-        """Validate rich text configuration."""
+        """
+        Validate rich text configuration.
+        """
         if not all(isinstance(span, TextSpan) for span in self.spans):
             raise TypeError("RichText spans must contain TextSpan instances.")
         if self.align not in {"start", "center", "end", "left", "right"}:

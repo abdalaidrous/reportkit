@@ -2,12 +2,16 @@ from ..base import BaseHtmlRenderer
 
 
 class KeyValueRenderer(BaseHtmlRenderer):
-    """Render a labeled information field."""
+    """
+    Render a labeled information field.
+    """
 
     template_name = "components/information/key_value.html"
 
     def render(self, component, context, engine):
-        """Render the label and its supplied value."""
+        """
+        Render the label and its supplied value.
+        """
         style = engine.styles.resolve(context.resolve_style(component))
         label_style = engine.styles.resolve(component.label_style)
         value_style = engine.styles.resolve(component.value_style)

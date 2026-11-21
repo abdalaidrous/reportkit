@@ -5,6 +5,8 @@ from ...core.component import Component
 
 @dataclass
 class Text(Component):
-    """Represent a text component."""
+    """
+    Represent a text component.
+    """
 
     value: str = ""

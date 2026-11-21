@@ -2,14 +2,18 @@ import json
 
 
 class PageNumberStyleResolver:
-    """Resolve page numbering into CSS content expressions."""
+    """
+    Resolve page numbering into CSS content expressions.
+    """
 
     # Page margin boxes do not inherit the body font, so style them explicitly.
     DECLARATIONS = "font-family: Arial, 'Noto Sans Arabic', Tahoma, sans-serif; font-size: 8pt; color: #555555;"
 
     @classmethod
     def resolve(cls, format_string):
-        """Build CSS content for page counters."""
+        """
+        Build CSS content for page counters.
+        """
         parts = []
         remaining = format_string
         while remaining:

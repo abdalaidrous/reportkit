@@ -8,7 +8,9 @@ from .helpers import export_html
 
 
 class TableValidationTests(unittest.TestCase):
-    """Validation lives in validators and runs on construction."""
+    """
+    Validation lives in validators and runs on construction.
+    """
 
     def test_column_rules(self):
         with self.assertRaises(ValueError):
@@ -44,7 +46,9 @@ class TableValidationTests(unittest.TestCase):
 
 
 class TableRenderingTests(unittest.TestCase):
-    """Rendering of plain values, custom cells and lazy rows."""
+    """
+    Rendering of plain values, custom cells and lazy rows.
+    """
 
     columns = [TableColumn(key="date", title="Date"), TableColumn(key="amount", title="Amount", format="number")]
 

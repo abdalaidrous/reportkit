@@ -1,1 +1,3 @@
-"""Validation rules kept separate from component definitions."""
+"""
+Validation rules kept separate from component definitions.
+"""

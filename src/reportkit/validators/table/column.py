@@ -7,18 +7,24 @@ WIDTH = re.compile(r"^\d+(?:\.\d+)?(?:px|%|mm|cm|in|pt|em|rem)$")
 
 
 class TableColumnValidator:
-    """Validate TableColumn definitions."""
+    """
+    Validate TableColumn definitions.
+    """
 
     @classmethod
     def validate(cls, column):
-        """Run every column rule."""
+        """
+        Run every column rule.
+        """
         cls.validate_identity(column)
         cls.validate_presentation(column)
         cls.validate_formatting(column)
 
     @staticmethod
     def validate_identity(column):
-        """Validate the key and the header texts."""
+        """
+        Validate the key and the header texts.
+        """
         if not isinstance(column.key, str) or not column.key:
             raise ValueError("Column key must be a non-empty string.")
         if not isinstance(column.title, str):
@@ -28,7 +34,9 @@ class TableColumnValidator:
 
     @staticmethod
     def validate_presentation(column):
-        """Validate alignment, width and wrapping."""
+        """
+        Validate alignment, width and wrapping.
+        """
         if column.align not in ALIGNMENTS:
             raise ValueError("Invalid column alignment.")
         if column.header_align is not None and column.header_align not in ALIGNMENTS:
@@ -42,7 +50,9 @@ class TableColumnValidator:
 
     @staticmethod
     def validate_formatting(column):
-        """Validate value formatting options."""
+        """
+        Validate value formatting options.
+        """
         if column.format not in FORMATS:
             raise ValueError("Invalid column format.")
         if not isinstance(column.decimals, int) or isinstance(column.decimals, bool) or not 0 <= column.decimals <= 12:

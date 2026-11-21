@@ -5,24 +5,32 @@ from .component import Component
 
 @dataclass
 class Container(Component):
-    """Base component for managing nested report components."""
+    """
+    Base component for managing nested report components.
+    """
 
     children: list[Component] = field(default_factory=list)
 
     def __post_init__(self):
-        """Validate and initialize child components."""
+        """
+        Validate and initialize child components.
+        """
         children = self.children
         self.children = []
         self.extend(children)
 
     def add(self, component: Component):
-        """Add a validated child component."""
+        """
+        Add a validated child component.
+        """
         self._validate_child(component)
         self.children.append(component)
         return self
 
     def extend(self, components: list[Component]):
-        """Add multiple validated child components."""
+        """
+        Add multiple validated child components.
+        """
         components = list(components)
         for component in components:
             self._validate_child(component)
@@ -30,7 +38,9 @@ class Container(Component):
         return self
 
     def _validate_child(self, component: Component):
-        """Validate child type and prevent circular references."""
+        """
+        Validate child type and prevent circular references.
+        """
         if not isinstance(component, Component):
             raise TypeError("Child must be a Component.")
         if component is self:
@@ -39,7 +49,9 @@ class Container(Component):
             raise ValueError("Circular component references are not allowed.")
 
     def _contains(self, target: Component):
-        """Check whether a component exists in the descendant tree."""
+        """
+        Check whether a component exists in the descendant tree.
+        """
         visited = set()
         stack = list(self.children)
         while stack:

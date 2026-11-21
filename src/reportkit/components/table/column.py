@@ -5,7 +5,9 @@ from ...validators.table.column import TableColumnValidator
 
 @dataclass(frozen=True, kw_only=True)
 class TableColumn:
-    """Define a table column and its presentation options."""
+    """
+    Define a table column and its presentation options.
+    """
 
     key: str
     title: str
@@ -21,5 +23,7 @@ class TableColumn:
     date_format: str | None = None
 
     def __post_init__(self):
-        """Validate the column definition."""
+        """
+        Validate the column definition.
+        """
         TableColumnValidator.validate(self)

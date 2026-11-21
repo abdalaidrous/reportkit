@@ -8,7 +8,9 @@ from .helpers import export_html
 
 
 class PageResolverTests(unittest.TestCase):
-    """Print CSS generation and validation."""
+    """
+    Print CSS generation and validation.
+    """
 
     def test_page_css_and_centered_number(self):
         html = export_html(Page(margin_top="10mm", page_number_position="bottom-center", children=[Text(value="x"), PageNumber(format="Page {page} of {pages}")]))

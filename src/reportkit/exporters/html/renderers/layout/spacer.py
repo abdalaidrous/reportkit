@@ -2,12 +2,16 @@ from ..base import BaseHtmlRenderer
 
 
 class SpacerRenderer(BaseHtmlRenderer):
-    """Render empty spacing between report components."""
+    """
+    Render empty spacing between report components.
+    """
 
     template_name = "components/layout/spacer.html"
 
     def render(self, component, context, engine):
-        """Render a spacer with the requested height."""
+        """
+        Render a spacer with the requested height.
+        """
         if isinstance(component.height, bool) or not isinstance(component.height, (int, float)) or not 0 <= component.height < float("inf"):
             raise ValueError("Spacer height must be a finite non-negative number.")
         style = engine.styles.resolve(context.resolve_style(component))

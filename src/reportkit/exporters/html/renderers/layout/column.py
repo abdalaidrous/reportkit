@@ -2,13 +2,17 @@ from ..base import BaseHtmlRenderer
 
 
 class ColumnRenderer(BaseHtmlRenderer):
-    """Render styled vertical layouts."""
+    """
+    Render styled vertical layouts.
+    """
 
     template_name = "components/layout/column.html"
 
     @staticmethod
     def resolve_layout(component):
-        """Resolve column layout properties."""
+        """
+        Resolve column layout properties.
+        """
         styles = []
         if component.align not in (None, "start", "center", "end", "stretch"):
             raise ValueError("Invalid column alignment.")
@@ -27,7 +31,9 @@ class ColumnRenderer(BaseHtmlRenderer):
         return "; ".join(styles)
 
     def render(self, component, context, engine):
-        """Render a column with its children and styles."""
+        """
+        Render a column with its children and styles.
+        """
         children = self.render_children(component, context, engine)
         style = engine.styles.resolve(context.resolve_style(component))
         layout = self.resolve_layout(component)

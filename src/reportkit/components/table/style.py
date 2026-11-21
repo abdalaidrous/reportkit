@@ -3,7 +3,9 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True, kw_only=True)
 class TableStyle:
-    """Define table presentation and print settings."""
+    """
+    Define table presentation and print settings.
+    """
 
     bordered: bool = True
     striped: bool = False

@@ -4,23 +4,31 @@ ROW_KINDS = {"data", "group-header", "subtotal", "total"}
 
 
 class TableRowValidator:
-    """Validate TableRow definitions."""
+    """
+    Validate TableRow definitions.
+    """
 
     @classmethod
     def validate(cls, row):
-        """Run every row rule."""
+        """
+        Run every row rule.
+        """
         cls.validate_kind(row)
         cls.validate_content(row)
 
     @staticmethod
     def validate_kind(row):
-        """Validate the row kind."""
+        """
+        Validate the row kind.
+        """
         if row.kind not in ROW_KINDS:
             raise ValueError("Unsupported table row kind.")
 
     @staticmethod
     def validate_content(row):
-        """Validate values and explicit cells."""
+        """
+        Validate values and explicit cells.
+        """
         from ...components.table.cell import TableCell  # Deferred: the component modules import this validator.
 
         if not isinstance(row.values, Mapping):
