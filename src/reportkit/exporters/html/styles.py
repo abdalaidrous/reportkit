@@ -10,7 +10,6 @@ class HtmlStyleResolver:
     """
     Convert component styles into safe CSS declarations.
     """
-
     PROPERTIES = {
         "font_family": "font-family",
         "font_size": "font-size",
