@@ -16,6 +16,13 @@ dependencies = [
 pdf = [
     "weasyprint>=70",
 ]
+excel = [
+    "openpyxl>=3.1",
+    "pillow>=10",
+]
+test = [
+    "pytest>=8",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]

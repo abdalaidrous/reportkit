@@ -153,8 +153,14 @@ reportkit/
 │       │   ├── dependencies.py   # تحميل WeasyPrint الاختياري
 │       │   ├── exceptions.py     # PdfExportError
 │       │   └── resources/        # fetcher.py (URLFetcher لـ WeasyPrint 70) و policy.py (PdfResourcePolicy)
-│       ├── json.py
-│       └── excel.py
+│       ├── excel/
+│       │   ├── exporter.py       # ExcelExporter + ExcelOptions (mode, streaming, sheet_name, decimal_policy)
+│       │   ├── workbook.py       # ExcelWorkbook + FormattedEngine + DataEngine
+│       │   ├── worksheet.py      # FormattedSheet (دمج/طباعة) و DataSheet (إلحاق فقط، يعمل مع Streaming)
+│       │   ├── styles.py         # Style → openpyxl مع cache، والألوان من tokens.css
+│       │   ├── values.py         # الأنواع الأصلية، سياسة Decimal، تنسيقات الأرقام والتواريخ
+│       │   └── renderers/        # Renderer لكل مكوّن في كل نمط
+│       └── json.py
 ├── tests/                       # unittest: الجداول والصفحات
 ```
 
@@ -196,6 +202,21 @@ docker build -t reportkit-pdf .
 docker run --rm reportkit-pdf
 docker run --rm -v "${PWD}/examples:/app/examples" reportkit-pdf python -m examples.financial_movement.report --pdf
 ```
+
+## تصدير Excel
+
+```python
+from reportkit.exporters.excel import ExcelExporter, ExcelOptions
+
+xlsx = ExcelExporter().export(document, context)                                      # formatted: يشبه HTML/PDF
+xlsx = ExcelExporter().export(document, context, ExcelOptions(mode="data", streaming=True))  # data: ورقة لكل جدول
+```
+
+- openpyxl اعتماد اختياري: `pip install -e ".[excel]"` (و Pillow للصور).
+- لا حسابات ولا معادلات: القيم تُكتب كما وصلت، والنصوص تُخزن كنص دائمًا (حماية من Formula Injection).
+- Decimal: يُكتب كرقم إذا كان ضمن 15 رقمًا معنويًا (دقة Excel)، وإلا يُرفع `ExcelExportError` أو يُكتب نصًا مع `decimal_policy="text"`.
+- `formatted` لا يعمل مع `streaming=True` (يحتاج دمج خلايا وكتابة غير متسلسلة)؛ استخدم `data` للتقارير الضخمة.
+- غير مدعوم: `Chart` و`PageCount` (وهما بلا Renderer في HTML أيضًا)، والصور البعيدة وصور SVG.
 
 ## التحقق
 
