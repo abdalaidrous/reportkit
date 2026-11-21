@@ -6,7 +6,9 @@
         {% if table_style.hover %}rk-table--hover{% endif %}
         {% if table_style.compact %}rk-table--compact{% endif %}
         {% if table_style.repeat_header %}rk-table--repeat-header{% endif %}
-        {% if table_style.avoid_row_break %}rk-table--avoid-row-break{% endif %}"
+        {% if table_style.avoid_row_break %}rk-table--avoid-row-break{% endif %}
+        {% if table_style.ruled %}rk-table--ruled{% endif %}
+        rk-table--layout-{{ table_style.layout }}"
         {% if style %}style="{{ style }}"{% endif %}
     >
 
@@ -25,7 +27,10 @@
             <tr>
                 {% for column in columns %}
                 <th scope="col" style="text-align: {{ column.header_align or column.align }}">
-                    {{ column.title }}
+                    <span class="rk-table-th__title">{{ column.title }}</span>
+                    {%- if column.subtitle %}
+                    <span class="rk-table-th__subtitle">{{ column.subtitle }}</span>
+                    {%- endif %}
                 </th>
                 {% endfor %}
             </tr>
@@ -39,9 +44,14 @@
                 <td
                     {% if cell.colspan > 1 %}colspan="{{ cell.colspan }}"{% endif %}
                     {% if cell.rowspan > 1 %}rowspan="{{ cell.rowspan }}"{% endif %}
+                    {% if cell.nowrap %}class="rk-table-cell--nowrap"{% endif %}
                     style="text-align: {{ cell.align }};{% if cell.style %} {{ cell.style }}{% endif %}"
                 >
-                    {{ cell.display }}
+                    {%- if cell.content is not none %}
+                    <div class="rk-table-cell__content">{{ cell.content | safe }}</div>
+                    {%- else %}
+                    <span class="rk-table-cell__value">{{ cell.display }}</span>
+                    {%- endif %}
                 </td>
                 {% endfor %}
             </tr>
@@ -55,9 +65,14 @@
                 <td
                     {% if cell.colspan > 1 %}colspan="{{ cell.colspan }}"{% endif %}
                     {% if cell.rowspan > 1 %}rowspan="{{ cell.rowspan }}"{% endif %}
+                    {% if cell.nowrap %}class="rk-table-cell--nowrap"{% endif %}
                     style="text-align: {{ cell.align }};{% if cell.style %} {{ cell.style }}{% endif %}"
                 >
-                    {{ cell.display }}
+                    {%- if cell.content is not none %}
+                    <div class="rk-table-cell__content">{{ cell.content | safe }}</div>
+                    {%- else %}
+                    <span class="rk-table-cell__value">{{ cell.display }}</span>
+                    {%- endif %}
                 </td>
                 {% endfor %}
             </tr>

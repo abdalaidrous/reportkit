@@ -4,12 +4,15 @@ class PageMarginRegistry:
     def __init__(self):
         self.positions = {}
 
-    def register(self, position, content):
-        """Register one page margin rule."""
+    def register(self, position, content, declarations=""):
+        """Register one page margin rule with optional extra CSS declarations."""
         if position in self.positions:
             raise ValueError(f"Page margin position '{position}' is already occupied.")
-        self.positions[position] = content
+        self.positions[position] = (content, declarations)
 
     def render(self):
         """Render registered margin rules."""
-        return [f"@{position} {{ content: {content}; }}" for position, content in self.positions.items()]
+        return [
+            f"@{position} {{ content: {content};{' ' + declarations if declarations else ''} }}"
+            for position, (content, declarations) in self.positions.items()
+        ]

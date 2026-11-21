@@ -1,8 +1,8 @@
 .rk-table-container {
     width: 100%;
     overflow: hidden;
-    border: 1px solid var(--rk-color-border);
-    border-radius: var(--rk-radius-md);
+    border: 1px solid var(--rk-table-frame-color);
+    border-radius: var(--rk-table-radius);
 }
 
 .rk-table {
@@ -13,6 +13,10 @@
     text-align: start;
 }
 
+.rk-table--layout-auto {
+    table-layout: auto;
+}
+
 .rk-table-caption {
     padding: 16px;
     font-size: var(--rk-font-lg);
@@ -21,45 +25,91 @@
     caption-side: top;
 }
 
-.rk-table thead {
-    background: var(--rk-color-subtle);
-}
-
-.rk-table th {
-    padding: 14px 16px;
-    color: var(--rk-color-muted);
-    font-weight: 600;
-    border-bottom: 1px solid var(--rk-color-border);
-    white-space: pre-line;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-}
-
-.rk-table td {
-    padding: 13px 16px;
-    border-bottom: 1px solid var(--rk-color-border);
-    color: var(--rk-color-text);
-    white-space: pre-line;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-}
-
+/* Cells: wrap only at word boundaries; break inside a word only when it cannot fit at all. */
 .rk-table th,
 .rk-table td {
-    padding: 12px 16px;
+    padding: 8px 10px;
     vertical-align: middle;
+    border-bottom: 1px solid var(--rk-table-divider-color);
+    color: var(--rk-table-cell-color);
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+    line-height: 1.5;
 }
 
 .rk-table thead th {
-    background: var(--rk-color-subtle);
-    color: var(--rk-color-muted);
-    font-weight: 600;
-    border-bottom: 1px solid var(--rk-color-border);
+    background: var(--rk-table-header-bg);
+    color: var(--rk-table-header-color);
+    font-weight: 800;
+    border-top: 1px solid var(--rk-table-header-accent);
+    border-bottom: 2px solid var(--rk-table-header-rule);
+}
+
+.rk-table-th__title,
+.rk-table-th__subtitle {
+    display: block;
+}
+
+.rk-table-th__title {
+    white-space: pre-line;
+}
+
+.rk-table-th__subtitle {
+    margin-top: 2px;
+    color: var(--rk-table-subtitle-color);
+    font-size: 0.85em;
+    font-weight: 400;
+}
+
+.rk-table-cell__value {
+    white-space: pre-line;
+}
+
+/* Auto-layout tables size columns to their headers, so header text never wraps. */
+.rk-table--layout-auto .rk-table-th__title {
+    white-space: pre;
+}
+
+.rk-table--layout-auto .rk-table-th__subtitle {
+    white-space: nowrap;
+}
+
+/* Mixed Arabic/Latin values pick their own direction (e.g. "12:47 AM" stays LTR inside an RTL table). */
+.rk-table-cell__value,
+.rk-table-cell__content > *,
+.rk-table-th__subtitle {
+    unicode-bidi: plaintext;
+}
+
+/* Custom cells: child components stack vertically and follow the cell alignment. */
+.rk-table-cell__content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.rk-table .rk-table-cell__content > * {
+    margin: 0;
+    color: inherit;
+    font-size: inherit;
+    line-height: 1.4;
+    text-align: inherit;
+}
+
+.rk-table-cell--nowrap,
+.rk-table-cell--nowrap .rk-table-cell__value,
+.rk-table-cell--nowrap .rk-table-cell__content > * {
+    white-space: nowrap;
+}
+
+.rk-table tbody tr:last-child td {
+    border-bottom: 0;
 }
 
 .rk-table--bordered th,
 .rk-table--bordered td {
-    border: 1px solid var(--rk-color-border);
+    border: 1px solid var(--rk-table-divider-color);
 }
 
 .rk-table--striped tbody tr:nth-child(even):not(.rk-table-group-header):not(.rk-table-subtotal):not(.rk-table-total) {
@@ -72,20 +122,8 @@
 
 .rk-table--compact th,
 .rk-table--compact td {
-    padding: 6px 10px;
+    padding: 5px 8px;
     font-size: 12px;
-}
-
-.rk-table tbody tr:last-child td {
-    border-bottom: 0;
-}
-
-.rk-table tbody tr:nth-child(even) {
-    background: var(--rk-color-surface);
-}
-
-.rk-table tbody tr:hover {
-    background: var(--rk-color-subtle);
 }
 
 .rk-table tfoot {
@@ -93,7 +131,6 @@
 }
 
 .rk-table-total td {
-    padding: 16px;
     font-weight: 700;
     border-top: 2px solid var(--rk-color-border);
     border-bottom: 0;
@@ -116,6 +153,37 @@
 .rk-table-group-header {
     background: #e2e8f0;
     font-weight: 700;
+}
+
+/* Ruled: no outer frame or vertical lines; heavy rules above/below the header and above the total. */
+.rk-table-container:has(> .rk-table--ruled) {
+    border: 0;
+    border-radius: 0;
+}
+
+.rk-table--ruled th,
+.rk-table--ruled td {
+    border-left: 0;
+    border-right: 0;
+}
+
+.rk-table--ruled thead th {
+    border-top: 1px solid var(--rk-table-ruled-color);
+    border-bottom: 2px solid var(--rk-table-ruled-color);
+}
+
+.rk-table--ruled td {
+    border-bottom-color: var(--rk-table-ruled-divider-color);
+}
+
+.rk-table--ruled tfoot,
+.rk-table--ruled .rk-table-total {
+    background: transparent;
+}
+
+.rk-table--ruled .rk-table-total td {
+    border-top: 2px solid var(--rk-table-ruled-color);
+    color: var(--rk-table-header-color);
 }
 
 @media print {

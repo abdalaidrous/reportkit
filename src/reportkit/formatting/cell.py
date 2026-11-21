@@ -13,3 +13,5 @@ class FormattedTableCell:
     rowspan: int = 1
     style: str = ""
     color: str | None = None
+    content: str | None = None
+    nowrap: bool = False

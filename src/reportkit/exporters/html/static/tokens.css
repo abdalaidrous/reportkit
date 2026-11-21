@@ -22,4 +22,17 @@
     --rk-font-lg: 18px;
     --rk-font-xl: 24px;
     --rk-font-2xl: 30px;
+
+    /* Tables */
+    --rk-table-frame-color: #dddddd;
+    --rk-table-radius: 0;
+    --rk-table-header-bg: #f0f0f0;
+    --rk-table-header-color: #262626;
+    --rk-table-header-accent: #53789d;
+    --rk-table-header-rule: #333333;
+    --rk-table-subtitle-color: #8d8d8d;
+    --rk-table-cell-color: #444444;
+    --rk-table-divider-color: #e2e2e2;
+    --rk-table-ruled-color: #555555;
+    --rk-table-ruled-divider-color: #ececec;
 }

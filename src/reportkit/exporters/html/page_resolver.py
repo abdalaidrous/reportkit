@@ -25,7 +25,7 @@ class HtmlPageResolver:
         margins = PageMarginRegistry()
         if numbers:
             content = PageNumberStyleResolver.resolve(numbers[0].format)
-            margins.register(pages[0].page_number_position, content)
+            margins.register(pages[0].page_number_position, content, PageNumberStyleResolver.DECLARATIONS)
         running = RunningElementResolver.find_components(document)
         RunningElementResolver.validate(running)
         for component in running:
