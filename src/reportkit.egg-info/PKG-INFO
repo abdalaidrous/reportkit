@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: reportkit
+Version: 0.1.0
+Summary: A Python library for building report documents.
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: Jinja2==3.1.6
