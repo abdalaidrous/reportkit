@@ -1,7 +1,7 @@
 from .document import Report, Page, Header, Footer
 from .layout import Section, Row, Column, Grid, Spacer, Divider
 from .text import Text, Heading
-from .table import Table
+from .table import Table, TableColumn
 from .media import Image, Chart
 from .pagination import PageBreak, PageNumber, PageCount
 from ..core.registry import ComponentRegistry

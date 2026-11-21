@@ -29,7 +29,14 @@ class HtmlTemplateEngine:
         """
         Load the default report stylesheets in order.
         """
-        files = ("tokens.css", "base.css", "typography.css", "layout.css", "print.css")
+        files = (
+            "tokens.css",
+            "base.css",
+            "typography.css",
+            "layout.css",
+            "table.css",
+            "print.css",
+        )
         return "\n".join(
             (self.static_dir / name).read_text(encoding="utf-8") for name in files
         )

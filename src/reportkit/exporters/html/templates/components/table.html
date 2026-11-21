@@ -1,0 +1,25 @@
+<div class="rk-table-container">
+    <table class="rk-table"{% if style %} style="{{ style }}"{% endif %}>
+        <thead>
+            <tr>
+                {% for column in columns %}
+                <th scope="col" style="text-align: {{ column.align }};{% if column.width %} width: {{ column.width }};{% endif %}">
+                    {{ column.title }}
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                {% for cell in row %}
+                <td style="text-align: {{ cell.align }};{% if cell.color %} color: {{ cell.color }};{% endif %}">
+                    {{ cell.display }}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
