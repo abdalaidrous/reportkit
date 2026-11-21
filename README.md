@@ -63,6 +63,34 @@ context = RenderingContext(language="ar", direction="rtl")
 Rows can be any iterable, including generators and database cursors: they are read one at a time and never loaded into
 a list.
 
+### Builder
+
+`ReportBuilder` builds the same tree fluently. It returns a plain `Report`, so every exporter works unchanged, and it
+places a repeated header or footer before the content so it shows from the first page.
+
+```python
+from reportkit.builders import ReportBuilder, TableBuilder
+
+report = (
+    ReportBuilder("Financial Movement Report")
+    .page(size="A4", margin="10mm 11mm 12mm", page_number_position="bottom-center")
+    .header(Heading(value="تقرير الحركة المالية", level=2))
+    .table(columns, rows, totals={"voucher": "الإجمالي", "amount": 200})   # rows: mappings or TableRow, kept lazy
+    .spacer(20)
+    .footer(Text(value="Printed by ReportKit"), repeat=True)
+    .page_number("Page {page} of {pages}")
+    .build()
+)
+
+pdf_bytes = ReportBuilder("Quick").table(columns, rows).export("pdf", context)
+ReportBuilder("Quick").table(columns, rows).export_to("docx", "report.docx", context)
+
+table = TableBuilder().column("voucher", "رقم السند", subtitle="Voucher No.").rows(rows).totals(total).build()
+```
+
+Totals are passed prepared; the builder never calculates. Exporter options go through as keywords, for example
+`export("pdf", context, options=PdfOptions(workers=4))`.
+
 ## Exporting
 
 Every exporter returns `bytes`; saving or sending them is up to your application.

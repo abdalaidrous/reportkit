@@ -121,6 +121,7 @@ reportkit/
 │   │   ├── information/         # KeyValue, InfoGrid
 │   │   ├── media/               # Image, Chart
 │   │   └── pagination/          # PageBreak, PageNumber, PageCount
+│   ├── builders/                # واجهة Builder: report.py (ReportBuilder)، table.py (TableBuilder)، export.py (ReportExport)
 │   ├── validators/
 │   │   └── table/               # column, cell, row, table: قواعد التحقق خارج المكونات
 │   ├── styles/                  # Style وTheme
@@ -173,6 +174,21 @@ reportkit/
 - `TableCell` يقبل `value` أو `children` وليس الاثنين، و`align=None` يرث محاذاة العمود.
 - الصفوف قد تكون iterable كسول، ولا تُحوّل إلى قائمة؛ يتم التحقق من كل صف عند عرضه.
 - ألوان الجداول وتباعد الخلايا متغيرات في `tokens.css` (`--rk-table-*`).
+
+## Builder
+
+```python
+from reportkit.builders import ReportBuilder, TableBuilder
+
+report = ReportBuilder("Title").page(margin="10mm 11mm").header(...).table(columns, rows, totals=total).footer(...).page_number().build()
+ReportBuilder("Title").table(columns, rows).export_to("pdf", "report.pdf", context, options=PdfOptions(workers=4))
+```
+
+- طبقة فوق المكونات فقط: `build()` يُرجع `Report` عاديًا بصفحة واحدة، والبناء المباشر بالمكونات يبقى كما هو. التحقق يبقى في المكونات والـ Validators.
+- الترتيب يُدار داخليًا: الترويسة أولًا، والتذييل المتكرر قبل المحتوى، والتذييل غير المتكرر ثم رقم الصفحة في النهاية، مهما كان ترتيب الاستدعاء.
+- `TableBuilder` يغلّف الصفوف في `PreparedRows`: تحويل كسول من dict إلى `TableRow` يعيد قراءة المصدر في كل تكرار. `totals` يصبح `TableRow(kind="total")` ولا يُحسب شيء.
+- `ReportExport` يستورد حزمة المصدّر حسب الصيغة (`html`, `pdf`, `excel`/`xlsx`, `word`/`docx`) ثم يستخدم `ExporterRegistry`، ويفضّل `export_to` للمصدّر إن وُجد. الخيارات تمر كـ kwargs.
+- الاختبار `tests/test_builders.py` يقارن HTML مثال الحركة المالية المبني بالـ Builder مع البناء المباشر.
 
 ## طريقة إضافة مكوّن جديد
 
