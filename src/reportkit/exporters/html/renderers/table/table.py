@@ -1,64 +1,47 @@
-from .....components.table import TableCell, TableRow
-from .....formatting.cell import FormattedTableCell
-from .....formatting.cells import TableCellFormatter
-from .....styles.style import Style
+from .....validators.table.table import TableValidator
 from ..base import BaseHtmlRenderer
+from .cell import TableCellRenderer
 
 
 class TableRenderer(BaseHtmlRenderer):
-    """Render prepared table rows and cells into HTML."""
+    """Prepare the table, its header and its rows; cells are delegated to TableCellRenderer."""
 
     template_name = "components/table/table.html"
 
-    def render(self, component, context, engine):
-        """Render the supplied table without aggregations."""
-        style = engine.styles.resolve(context.resolve_style(component))
-        rows = self.prepare_rows(component.rows, component.columns, context, engine)
-        footer = self.prepare_row(component.footer, component.columns, context, engine) if component.footer else None
-        return engine.templates.render(self.template_name, columns=component.columns, rows=rows, footer=footer, header=component.header, table_style=component.table_style, style=style)
+    def __init__(self, cells=None):
+        """Use the given cell renderer or the default one."""
+        self.cells = cells if cells is not None else TableCellRenderer()
 
-    def prepare_rows(self, rows, columns, context, engine):
-        """Yield formatted table rows lazily."""
-        for row in rows:
-            yield self.prepare_row(row, columns, context, engine)
+    def render(self, component, context, engine):
+        """Render the table; rows are prepared lazily while the template iterates."""
+        style = engine.styles.resolve(context.resolve_style(component))
+        rows = self.prepare_rows(component, context, engine)
+        footer = self.prepare_row(component.footer, component.columns, context, engine) if component.footer else None
+        header = [self.prepare_header(column) for column in component.columns]
+        return engine.templates.render(self.template_name, table_class=self.table_class(component.table_style), columns=component.columns, header=header, caption=component.header, rows=rows, footer=footer, show_header=component.table_style.show_header, style=style)
+
+    def prepare_rows(self, component, context, engine):
+        """Yield rows one by one without materializing the iterable."""
+        for row in component.rows:
+            yield self.prepare_row(row, component.columns, context, engine)
 
     def prepare_row(self, row, columns, context, engine):
-        """Prepare one externally supplied row."""
-        if not isinstance(row, TableRow):
-            raise TypeError("Table rows must be TableRow instances.")
+        """Prepare one row from its explicit cells or its values."""
+        TableValidator.validate_row(row)
         if row.cells is not None:
-            cells = [self.prepare_explicit_cell(cell, context, engine) for cell in row.cells]
+            cells = [self.cells.render_cell(cell, context, engine) for cell in row.cells]
         else:
-            cells = [self.prepare_value(row.values.get(column.key), column, context, engine) for column in columns]
-        return {"kind": row.kind, "cells": cells, "style": engine.styles.resolve(row.style)}
+            cells = [self.cells.render(row.values.get(column.key), column, context, engine) for column in columns]
+        return {"css_class": f"rk-table-row rk-table-{row.kind}", "style": engine.styles.resolve(row.style), "cells": cells}
 
-    def prepare_value(self, value, column, context, engine):
-        """Prepare a row value: a TableCell renders as-is, anything else is formatted by the column."""
-        if isinstance(value, TableCell):
-            return self.prepare_explicit_cell(value, context, engine, column)
-        return self.prepare_column_cell(value, column, engine)
+    @staticmethod
+    def prepare_header(column):
+        """Prepare one header cell."""
+        return {"title": column.title, "subtitle": column.subtitle, "align": column.header_align or column.align, "nowrap": column.nowrap}
 
-    def prepare_column_cell(self, value, column, engine):
-        """Format a plain value using its column definition."""
-        formatted = TableCellFormatter.format(value, column)
-        style_values = {"vertical_align": column.vertical_align}
-        if formatted.color:
-            style_values["color"] = formatted.color
-        return FormattedTableCell(display=formatted.display, align=formatted.align, style=engine.styles.resolve(Style(**style_values)), nowrap=column.nowrap)
-
-    def prepare_explicit_cell(self, cell, context, engine, column=None):
-        """Prepare an explicit cell, rendering its child components when present."""
-        if not isinstance(cell, TableCell):
-            raise TypeError("Explicit table cells must be TableCell instances.")
-        content = "".join(engine.render(child, context) for child in cell.children) if cell.children else None
-        align = cell.align or (column.align if column else "start")
-        style = Style(vertical_align=column.vertical_align).merge(cell.style) if column else cell.style
-        return FormattedTableCell(
-            display="" if cell.value is None else str(cell.value),
-            content=content,
-            align=align,
-            colspan=cell.colspan,
-            rowspan=cell.rowspan,
-            style=engine.styles.resolve(style),
-            nowrap=column.nowrap if column else False,
-        )
+    @staticmethod
+    def table_class(table_style):
+        """Build the table classes from its style options."""
+        flags = ("bordered", "striped", "hover", "compact", "ruled", "repeat_header", "avoid_row_break")
+        names = [f"rk-table--{flag.replace('_', '-')}" for flag in flags if getattr(table_style, flag)]
+        return " ".join(["rk-table", f"rk-table--layout-{table_style.layout}", *names])

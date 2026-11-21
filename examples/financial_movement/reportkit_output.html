@@ -8,23 +8,8 @@
 
     <style>
         :root {
+    /* Typography */
     --rk-font-family: "Inter", "Noto Sans Arabic", Arial, sans-serif;
-    --rk-color-primary: #2563eb;
-    --rk-color-text: #172033;
-    --rk-color-muted: #64748b;
-    --rk-color-border: #e2e8f0;
-    --rk-color-surface: #ffffff;
-    --rk-color-subtle: #f8fafc;
-    --rk-space-1: 4px;
-    --rk-space-2: 8px;
-    --rk-space-3: 12px;
-    --rk-space-4: 16px;
-    --rk-space-5: 24px;
-    --rk-space-6: 32px;
-    --rk-space-7: 48px;
-    --rk-radius-sm: 6px;
-    --rk-radius-md: 10px;
-    --rk-radius-lg: 16px;
     --rk-font-xs: 11px;
     --rk-font-sm: 13px;
     --rk-font-md: 14px;
@@ -32,18 +17,63 @@
     --rk-font-xl: 24px;
     --rk-font-2xl: 30px;
 
+    /* Base colors */
+    --rk-color-primary: #2563eb;
+    --rk-color-text: #172033;
+    --rk-color-muted: #64748b;
+    --rk-color-border: #e2e8f0;
+    --rk-color-surface: #ffffff;
+    --rk-color-subtle: #f8fafc;
+    --rk-color-positive: #059669;
+    --rk-color-negative: #dc2626;
+
+    /* Neutral scale used by tables */
+    --rk-gray-50: #f8f8f8;
+    --rk-gray-100: #f0f0f0;
+    --rk-gray-200: #e2e2e2;
+    --rk-gray-300: #dddddd;
+    --rk-gray-500: #8d8d8d;
+    --rk-gray-600: #555555;
+    --rk-gray-700: #444444;
+    --rk-gray-800: #333333;
+    --rk-gray-900: #262626;
+    --rk-accent: #53789d;
+
+    /* Spacing */
+    --rk-space-1: 4px;
+    --rk-space-2: 8px;
+    --rk-space-3: 12px;
+    --rk-space-4: 16px;
+    --rk-space-5: 24px;
+    --rk-space-6: 32px;
+    --rk-space-7: 48px;
+
+    /* Radius */
+    --rk-radius-sm: 6px;
+    --rk-radius-md: 10px;
+    --rk-radius-lg: 16px;
+
     /* Tables */
-    --rk-table-frame-color: #dddddd;
     --rk-table-radius: 0;
-    --rk-table-header-bg: #f0f0f0;
-    --rk-table-header-color: #262626;
-    --rk-table-header-accent: #53789d;
-    --rk-table-header-rule: #333333;
-    --rk-table-subtitle-color: #8d8d8d;
-    --rk-table-cell-color: #444444;
-    --rk-table-divider-color: #e2e2e2;
-    --rk-table-ruled-color: #555555;
-    --rk-table-ruled-divider-color: #ececec;
+    --rk-table-frame-color: var(--rk-gray-300);
+    --rk-table-divider-color: var(--rk-gray-200);
+    --rk-table-header-bg: var(--rk-gray-100);
+    --rk-table-header-color: var(--rk-gray-900);
+    --rk-table-header-accent: var(--rk-accent);
+    --rk-table-header-rule: var(--rk-gray-800);
+    --rk-table-subtitle-color: var(--rk-gray-500);
+    --rk-table-cell-color: var(--rk-gray-700);
+    --rk-table-stripe-bg: var(--rk-gray-50);
+    --rk-table-hover-bg: var(--rk-gray-100);
+    --rk-table-group-bg: var(--rk-gray-200);
+    --rk-table-subtotal-bg: var(--rk-gray-100);
+    --rk-table-total-bg: var(--rk-gray-200);
+    --rk-table-ruled-color: var(--rk-gray-600);
+    --rk-table-cell-padding-y: 8px;
+    --rk-table-cell-padding-x: 10px;
+    --rk-table-compact-padding-y: 5px;
+    --rk-table-compact-padding-x: 8px;
+    --rk-table-caption-padding: var(--rk-space-4);
 }
 
 *,
@@ -229,9 +259,10 @@ body {
     border-radius: var(--rk-radius-md);
 }
 
+/* Container: wide tables scroll inside their frame on screen instead of widening the page. */
 .rk-table-container {
     width: 100%;
-    overflow: hidden;
+    overflow-x: auto;
     border: 1px solid var(--rk-table-frame-color);
     border-radius: var(--rk-table-radius);
 }
@@ -249,17 +280,17 @@ body {
 }
 
 .rk-table-caption {
-    padding: 16px;
+    padding: var(--rk-table-caption-padding);
     font-size: var(--rk-font-lg);
     font-weight: 700;
     text-align: start;
     caption-side: top;
 }
 
-/* Cells: wrap only at word boundaries; break inside a word only when it cannot fit at all. */
+/* Cells wrap at word boundaries and break a word only when it cannot fit at all. */
 .rk-table th,
 .rk-table td {
-    padding: 8px 10px;
+    padding: var(--rk-table-cell-padding-y) var(--rk-table-cell-padding-x);
     vertical-align: middle;
     border-bottom: 1px solid var(--rk-table-divider-color);
     color: var(--rk-table-cell-color);
@@ -293,100 +324,97 @@ body {
     font-weight: 400;
 }
 
-.rk-table-cell__value {
-    white-space: pre-line;
-}
-
-/* Auto-layout tables size columns to their headers, so header text never wraps. */
-.rk-table--layout-auto .rk-table-th__title {
-    white-space: pre;
-}
-
-.rk-table--layout-auto .rk-table-th__subtitle {
-    white-space: nowrap;
-}
-
-/* Mixed Arabic/Latin values pick their own direction (e.g. "12:47 AM" stays LTR inside an RTL table). */
+/* Plain values keep explicit line breaks and pick their own direction ("12:47 AM" stays LTR in RTL tables). */
 .rk-table-cell__value,
-.rk-table-cell__content > *,
 .rk-table-th__subtitle {
+    white-space: pre-line;
     unicode-bidi: plaintext;
 }
 
-/* Custom cells: child components stack vertically and follow the cell alignment. */
+/* Custom cells only lay out their children; the children keep their own styles. */
 .rk-table-cell__content {
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
-.rk-table .rk-table-cell__content > * {
+.rk-table-cell__content > * {
     margin: 0;
-    color: inherit;
-    font-size: inherit;
-    line-height: 1.4;
-    text-align: inherit;
 }
 
+/* No wrapping: auto layout widens the column, fixed layout clips with an ellipsis. */
+.rk-table-th--nowrap .rk-table-th__title,
+.rk-table-th--nowrap .rk-table-th__subtitle,
+.rk-table--layout-auto .rk-table-th__title,
+.rk-table--layout-auto .rk-table-th__subtitle,
 .rk-table-cell--nowrap,
-.rk-table-cell--nowrap .rk-table-cell__value,
-.rk-table-cell--nowrap .rk-table-cell__content > * {
+.rk-table-cell--nowrap .rk-table-cell__value {
     white-space: nowrap;
+}
+
+.rk-table--layout-fixed .rk-table-cell--nowrap {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rk-table-cell--positive {
+    color: var(--rk-color-positive);
+}
+
+.rk-table-cell--negative {
+    color: var(--rk-color-negative);
 }
 
 .rk-table tbody tr:last-child td {
     border-bottom: 0;
 }
 
+/* Options */
 .rk-table--bordered th,
 .rk-table--bordered td {
     border: 1px solid var(--rk-table-divider-color);
 }
 
-.rk-table--striped tbody tr:nth-child(even):not(.rk-table-group-header):not(.rk-table-subtotal):not(.rk-table-total) {
-    background: #f8fafc;
+.rk-table--striped tbody .rk-table-data:nth-child(even) {
+    background: var(--rk-table-stripe-bg);
 }
 
 .rk-table--hover tbody tr:hover {
-    background: #f1f5f9;
+    background: var(--rk-table-hover-bg);
 }
 
 .rk-table--compact th,
 .rk-table--compact td {
-    padding: 5px 8px;
-    font-size: 12px;
+    padding: var(--rk-table-compact-padding-y) var(--rk-table-compact-padding-x);
+    font-size: var(--rk-font-xs);
 }
 
-.rk-table tfoot {
-    background: var(--rk-color-subtle);
-}
-
-.rk-table-total td {
+/* Row kinds */
+.rk-table-group-header {
+    background: var(--rk-table-group-bg);
     font-weight: 700;
-    border-top: 2px solid var(--rk-color-border);
-    border-bottom: 0;
 }
 
 .rk-table-subtotal {
-    background: #f1f5f9;
+    background: var(--rk-table-subtotal-bg);
     font-weight: 600;
 }
 
 .rk-table-subtotal td {
-    border-top: 1px solid var(--rk-color-border);
+    border-top: 1px solid var(--rk-table-divider-color);
 }
 
 .rk-table-total {
-    background: #e2e8f0;
+    background: var(--rk-table-total-bg);
     font-weight: 700;
 }
 
-.rk-table-group-header {
-    background: #e2e8f0;
-    font-weight: 700;
+.rk-table-total td {
+    border-top: 2px solid var(--rk-table-divider-color);
+    border-bottom: 0;
 }
 
-/* Ruled: no outer frame or vertical lines; heavy rules above/below the header and above the total. */
+/* Ruled: no frame or vertical lines; heavy rules around the header and above the total. */
 .rk-table-container:has(> .rk-table--ruled) {
     border: 0;
     border-radius: 0;
@@ -403,11 +431,6 @@ body {
     border-bottom: 2px solid var(--rk-table-ruled-color);
 }
 
-.rk-table--ruled td {
-    border-bottom-color: var(--rk-table-ruled-divider-color);
-}
-
-.rk-table--ruled tfoot,
 .rk-table--ruled .rk-table-total {
     background: transparent;
 }
@@ -417,21 +440,34 @@ body {
     color: var(--rk-table-header-color);
 }
 
+/* Print follows the table options: the header repeats and rows stay whole only when asked. */
 @media print {
     .rk-table-container {
         overflow: visible;
     }
 
-    .rk-table thead {
+    .rk-table thead,
+    .rk-table tfoot {
+        display: table-row-group;
+    }
+
+    .rk-table--repeat-header thead {
         display: table-header-group;
     }
 
-    .rk-table tr {
+    .rk-table--avoid-row-break tr {
         break-inside: avoid;
+        page-break-inside: avoid;
     }
 
-    .rk-table tfoot {
-        display: table-footer-group;
+    .rk-table-caption,
+    .rk-table-group-header {
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+
+    .rk-table--hover tbody tr:hover {
+        background: transparent;
     }
 }
 
@@ -591,37 +627,6 @@ body {
         display: none !important;
     }
 
-    .rk-table-container {
-        overflow: hidden;
-        border: 0;
-    }
-
-    .rk-table {
-        width: 100%;
-    }
-
-    .rk-table--repeat-header thead {
-        display: table-header-group;
-    }
-
-    .rk-table--avoid-row-break tbody tr {
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
-
-    .rk-table tfoot {
-        display: table-row-group;
-    }
-
-    .rk-table-group-header {
-        break-after: avoid;
-        page-break-after: avoid;
-    }
-
-    .rk-table-caption {
-        break-after: avoid;
-    }
-
     .rk-page {
         max-width: none;
         min-height: 0;
@@ -751,460 +756,93 @@ body {
     
 </div>
 </div><div class="rk-table-container">
-    <table
-        class="rk-table
+    <table class="rk-table rk-table--layout-auto rk-table--repeat-header rk-table--avoid-row-break" style="font-size: 10.5px">
         
-        
-        
-        
-        rk-table--repeat-header
-        rk-table--avoid-row-break
-        
-        rk-table--layout-auto"
-        style="font-size: 10.5px"
-    >
-
-        
-
         <colgroup>
-            
-            <col>
-            
-            <col>
-            
-            <col>
-            
-            <col>
-            
-            <col>
-            
-            <col>
-            
-            <col>
-            
-            <col>
-            
-            <col>
-            
+            <col><col><col><col><col><col><col><col><col>
         </colgroup>
-
         
         <thead>
             <tr>
                 
-                <th scope="col" style="text-align: center">
-                    <span class="rk-table-th__title">رقم السند</span>
-                    <span class="rk-table-th__subtitle">Voucher No.</span>
+                <th scope="col" class="rk-table-th rk-table-th--nowrap" style="text-align: center">
+                    <span class="rk-table-th__title">رقم السند</span><span class="rk-table-th__subtitle">Voucher No.</span>
                 </th>
                 
-                <th scope="col" style="text-align: center">
-                    <span class="rk-table-th__title">نوع العملية</span>
-                    <span class="rk-table-th__subtitle">Operation</span>
+                <th scope="col" class="rk-table-th rk-table-th--nowrap" style="text-align: center">
+                    <span class="rk-table-th__title">نوع العملية</span><span class="rk-table-th__subtitle">Operation</span>
                 </th>
                 
-                <th scope="col" style="text-align: center">
-                    <span class="rk-table-th__title">التاريخ والوقت</span>
-                    <span class="rk-table-th__subtitle">Date &amp; Time</span>
+                <th scope="col" class="rk-table-th rk-table-th--nowrap" style="text-align: center">
+                    <span class="rk-table-th__title">التاريخ والوقت</span><span class="rk-table-th__subtitle">Date &amp; Time</span>
                 </th>
                 
-                <th scope="col" style="text-align: center">
-                    <span class="rk-table-th__title">البيان / الغرض</span>
-                    <span class="rk-table-th__subtitle">Description</span>
+                <th scope="col" class="rk-table-th" style="text-align: center">
+                    <span class="rk-table-th__title">البيان / الغرض</span><span class="rk-table-th__subtitle">Description</span>
                 </th>
                 
-                <th scope="col" style="text-align: center">
-                    <span class="rk-table-th__title">طريقة الدفع</span>
-                    <span class="rk-table-th__subtitle">Payment Method</span>
+                <th scope="col" class="rk-table-th" style="text-align: center">
+                    <span class="rk-table-th__title">طريقة الدفع</span><span class="rk-table-th__subtitle">Payment Method</span>
                 </th>
                 
-                <th scope="col" style="text-align: center">
-                    <span class="rk-table-th__title">الاتجاه</span>
-                    <span class="rk-table-th__subtitle">Direction</span>
+                <th scope="col" class="rk-table-th rk-table-th--nowrap" style="text-align: center">
+                    <span class="rk-table-th__title">الاتجاه</span><span class="rk-table-th__subtitle">Direction</span>
                 </th>
                 
-                <th scope="col" style="text-align: center">
-                    <span class="rk-table-th__title">المبلغ</span>
-                    <span class="rk-table-th__subtitle">Amount</span>
+                <th scope="col" class="rk-table-th rk-table-th--nowrap" style="text-align: center">
+                    <span class="rk-table-th__title">المبلغ</span><span class="rk-table-th__subtitle">Amount</span>
                 </th>
                 
-                <th scope="col" style="text-align: center">
-                    <span class="rk-table-th__title">البنك / الصندوق</span>
-                    <span class="rk-table-th__subtitle">Bank / Cashbox</span>
+                <th scope="col" class="rk-table-th" style="text-align: center">
+                    <span class="rk-table-th__title">البنك / الصندوق</span><span class="rk-table-th__subtitle">Bank / Cashbox</span>
                 </th>
                 
-                <th scope="col" style="text-align: center">
-                    <span class="rk-table-th__title">المستخدم</span>
-                    <span class="rk-table-th__subtitle">User</span>
+                <th scope="col" class="rk-table-th rk-table-th--nowrap" style="text-align: center">
+                    <span class="rk-table-th__title">المستخدم</span><span class="rk-table-th__subtitle">User</span>
                 </th>
                 
             </tr>
         </thead>
         
-
         <tbody>
             
-            <tr class="rk-table-data">
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">000004</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">سند قبض</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <div class="rk-table-cell__content"><p class="rk-text" >
+            <tr class="rk-table-row rk-table-data">
+                <td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">000004</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">سند قبض</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><div class="rk-table-cell__content"><p class="rk-text" style="font-size: 10.5px; color: #444444">
     14/11/2026
-</p><p class="rk-text" style="font-size: 9px; color: #777777">
+</p><p class="rk-text" style="font-size: 9px; color: #777777; direction: ltr">
     12:47 AM
-</p></div>
-                </td>
-                
-                <td
-                    
-                    
-                    
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">دفعة للحجز رقم
-(RES-A-000001)</span>
-                </td>
-                
-                <td
-                    
-                    
-                    
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">الدفع نقدًا</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">داخل</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">200.00 ﷼</span>
-                </td>
-                
-                <td
-                    
-                    
-                    
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">الصندوق</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">عبدالله العيدروس</span>
-                </td>
-                
+</p></div></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">دفعة للحجز رقم
+(RES-A-000001)</span></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">الدفع نقدًا</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">داخل</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">200.00 ﷼</span></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">الصندوق</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">عبدالله العيدروس</span></td>
             </tr>
             
-            <tr class="rk-table-data">
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">000003</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">سند قبض</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <div class="rk-table-cell__content"><p class="rk-text" >
+            <tr class="rk-table-row rk-table-data">
+                <td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">000003</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">سند قبض</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><div class="rk-table-cell__content"><p class="rk-text" style="font-size: 10.5px; color: #444444">
     13/11/2026
-</p><p class="rk-text" style="font-size: 9px; color: #777777">
+</p><p class="rk-text" style="font-size: 9px; color: #777777; direction: ltr">
     11:55 PM
-</p></div>
-                </td>
-                
-                <td
-                    
-                    
-                    
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">دفعة للحجز رقم
-(RES-A-000001)</span>
-                </td>
-                
-                <td
-                    
-                    
-                    
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">الدفع نقدًا</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">داخل</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">100.00 ﷼</span>
-                </td>
-                
-                <td
-                    
-                    
-                    
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">الصندوق</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">عبدالله العيدروس</span>
-                </td>
-                
+</p></div></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">دفعة للحجز رقم
+(RES-A-000001)</span></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">الدفع نقدًا</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">داخل</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">100.00 ﷼</span></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">الصندوق</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">عبدالله العيدروس</span></td>
             </tr>
             
-            <tr class="rk-table-data">
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">000002</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">سند قبض</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <div class="rk-table-cell__content"><p class="rk-text" >
+            <tr class="rk-table-row rk-table-data">
+                <td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">000002</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">سند قبض</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><div class="rk-table-cell__content"><p class="rk-text" style="font-size: 10.5px; color: #444444">
     13/11/2026
-</p><p class="rk-text" style="font-size: 9px; color: #777777">
+</p><p class="rk-text" style="font-size: 9px; color: #777777; direction: ltr">
     11:54 PM
-</p></div>
-                </td>
-                
-                <td
-                    
-                    
-                    
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">دفعة للحجز رقم
-(RES-A-000001)</span>
-                </td>
-                
-                <td
-                    
-                    
-                    
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">دفع بواسطة طرف ثالث</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">داخل</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">100.00 ﷼</span>
-                </td>
-                
-                <td
-                    
-                    
-                    
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">—</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">عبدالله العيدروس</span>
-                </td>
-                
+</p></div></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">دفعة للحجز رقم
+(RES-A-000001)</span></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">دفع بواسطة طرف ثالث</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">داخل</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">100.00 ﷼</span></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">—</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">عبدالله العيدروس</span></td>
             </tr>
             
-            <tr class="rk-table-data">
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">000001</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">سند قبض</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <div class="rk-table-cell__content"><p class="rk-text" >
+            <tr class="rk-table-row rk-table-data">
+                <td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">000001</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">سند قبض</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><div class="rk-table-cell__content"><p class="rk-text" style="font-size: 10.5px; color: #444444">
     13/11/2026
-</p><p class="rk-text" style="font-size: 9px; color: #777777">
+</p><p class="rk-text" style="font-size: 9px; color: #777777; direction: ltr">
     11:39 PM
-</p></div>
-                </td>
-                
-                <td
-                    
-                    
-                    
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">دفعة للحجز رقم
-(RES-A-000001)</span>
-                </td>
-                
-                <td
-                    
-                    
-                    
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">تمارا</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">داخل</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">100.00 ﷼</span>
-                </td>
-                
-                <td
-                    
-                    
-                    
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">—</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">عبدالله العيدروس</span>
-                </td>
-                
+</p></div></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">دفعة للحجز رقم
+(RES-A-000001)</span></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">تمارا</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">داخل</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">100.00 ﷼</span></td><td class="rk-table-cell" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">—</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">عبدالله العيدروس</span></td>
             </tr>
             
         </tbody>
-
         
     </table>
 </div><div class="rk-spacer" aria-hidden="true" style="height: 20px;"></div><div class="rk-grid" style="grid-template-columns: 1fr 1fr; direction: rtl; align-items: end; gap: 16px; margin-bottom: 6px">
@@ -1214,268 +852,57 @@ body {
     Summary by Payment Method
 </p>
 </div><div class="rk-table-container">
-    <table
-        class="rk-table
+    <table class="rk-table rk-table--layout-auto rk-table--ruled rk-table--repeat-header rk-table--avoid-row-break" style="font-size: 10.5px">
         
-        
-        
-        
-        rk-table--repeat-header
-        rk-table--avoid-row-break
-        rk-table--ruled
-        rk-table--layout-auto"
-        style="font-size: 10.5px"
-    >
-
-        
-
         <colgroup>
-            
-            <col style="width: 36%">
-            
-            <col>
-            
-            <col>
-            
-            <col>
-            
-            <col>
-            
+            <col style="width: 36%"><col><col><col><col>
         </colgroup>
-
         
         <thead>
             <tr>
                 
-                <th scope="col" style="text-align: right">
-                    <span class="rk-table-th__title">طريقة الدفع</span>
-                    <span class="rk-table-th__subtitle">Method</span>
+                <th scope="col" class="rk-table-th" style="text-align: right">
+                    <span class="rk-table-th__title">طريقة الدفع</span><span class="rk-table-th__subtitle">Method</span>
                 </th>
                 
-                <th scope="col" style="text-align: center">
-                    <span class="rk-table-th__title">عدد الحركات</span>
-                    <span class="rk-table-th__subtitle">Count</span>
+                <th scope="col" class="rk-table-th rk-table-th--nowrap" style="text-align: center">
+                    <span class="rk-table-th__title">عدد الحركات</span><span class="rk-table-th__subtitle">Count</span>
                 </th>
                 
-                <th scope="col" style="text-align: center">
-                    <span class="rk-table-th__title">سندات القبض</span>
-                    <span class="rk-table-th__subtitle">Receipts</span>
+                <th scope="col" class="rk-table-th rk-table-th--nowrap" style="text-align: center">
+                    <span class="rk-table-th__title">سندات القبض</span><span class="rk-table-th__subtitle">Receipts</span>
                 </th>
                 
-                <th scope="col" style="text-align: center">
-                    <span class="rk-table-th__title">سندات الصرف</span>
-                    <span class="rk-table-th__subtitle">Payments</span>
+                <th scope="col" class="rk-table-th rk-table-th--nowrap" style="text-align: center">
+                    <span class="rk-table-th__title">سندات الصرف</span><span class="rk-table-th__subtitle">Payments</span>
                 </th>
                 
-                <th scope="col" style="text-align: center">
-                    <span class="rk-table-th__title">الصافي</span>
-                    <span class="rk-table-th__subtitle">Net</span>
+                <th scope="col" class="rk-table-th rk-table-th--nowrap" style="text-align: center">
+                    <span class="rk-table-th__title">الصافي</span><span class="rk-table-th__subtitle">Net</span>
                 </th>
                 
             </tr>
         </thead>
         
-
         <tbody>
             
-            <tr class="rk-table-data">
-                
-                <td
-                    
-                    
-                    
-                    style="text-align: right; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">الدفع نقدًا</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">2</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">300.00</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">0.00</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">300.00</span>
-                </td>
-                
+            <tr class="rk-table-row rk-table-data">
+                <td class="rk-table-cell" style="text-align: right; vertical-align: middle"><span class="rk-table-cell__value">الدفع نقدًا</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">2</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">300.00</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">0.00</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">300.00</span></td>
             </tr>
             
-            <tr class="rk-table-data">
-                
-                <td
-                    
-                    
-                    
-                    style="text-align: right; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">تمارا</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">1</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">100.00</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">0.00</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">100.00</span>
-                </td>
-                
+            <tr class="rk-table-row rk-table-data">
+                <td class="rk-table-cell" style="text-align: right; vertical-align: middle"><span class="rk-table-cell__value">تمارا</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">1</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">100.00</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">0.00</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">100.00</span></td>
             </tr>
             
-            <tr class="rk-table-data">
-                
-                <td
-                    
-                    
-                    
-                    style="text-align: right; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">دفع بواسطة طرف ثالث</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">1</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">100.00</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">0.00</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">100.00</span>
-                </td>
-                
+            <tr class="rk-table-row rk-table-data">
+                <td class="rk-table-cell" style="text-align: right; vertical-align: middle"><span class="rk-table-cell__value">دفع بواسطة طرف ثالث</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">1</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">100.00</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">0.00</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">100.00</span></td>
             </tr>
             
         </tbody>
-
         
         <tfoot>
-            <tr class="rk-table-total">
-                
-                <td
-                    
-                    
-                    
-                    style="text-align: right; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">الإجمالي (﷼)</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">4</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">500.00</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">0.00</span>
-                </td>
-                
-                <td
-                    
-                    
-                    class="rk-table-cell--nowrap"
-                    style="text-align: center; vertical-align: middle"
-                >
-                    <span class="rk-table-cell__value">500.00</span>
-                </td>
-                
+            <tr class="rk-table-row rk-table-total">
+                <td class="rk-table-cell" style="text-align: right; vertical-align: middle"><span class="rk-table-cell__value">الإجمالي (﷼)</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">4</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">500.00</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">0.00</span></td><td class="rk-table-cell rk-table-cell--nowrap" style="text-align: center; vertical-align: middle"><span class="rk-table-cell__value">500.00</span></td>
             </tr>
         </tfoot>
         

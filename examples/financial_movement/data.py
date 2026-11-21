@@ -6,10 +6,10 @@ from reportkit.styles.style import Style
 
 
 def date_time(date, time):
-    """A custom cell: the date with a smaller gray time underneath."""
+    """A custom cell: the date with a smaller gray time underneath (children keep their own styles)."""
     return TableCell(children=[
-        Text(value=date),
-        Text(value=time, style=Style(font_size=9, color='#777777')),
+        Text(value=date, style=Style(font_size=10.5, color='#444444')),
+        Text(value=time, style=Style(font_size=9, color='#777777', direction='ltr')),
     ])
 
 

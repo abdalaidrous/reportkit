@@ -3,15 +3,8 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True, kw_only=True)
 class FormattedTableCell:
-    """
-    Represent a formatted cell ready for rendering.
-    """
+    """Hold a plain value formatted for display; tone is 'positive', 'negative' or None."""
 
     display: str
     align: str = "start"
-    colspan: int = 1
-    rowspan: int = 1
-    style: str = ""
-    color: str | None = None
-    content: str | None = None
-    nowrap: bool = False
+    tone: str | None = None

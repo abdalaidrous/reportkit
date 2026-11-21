@@ -5,34 +5,18 @@ from .values import ValueFormatter
 
 
 class TableCellFormatter:
-    """
-    Prepare table cells using column formatting rules.
-    """
+    """Format plain table values using their column rules."""
 
     @classmethod
     def format(cls, value, column):
-        """
-        Build a formatted table cell.
-        """
-        display = ValueFormatter.format(
-            value,
-            format_type=column.format,
-            decimals=column.decimals,
-            currency=column.currency,
-            date_format=column.date_format
-            or ("%Y-%m-%d %H:%M" if column.format == "datetime" else "%Y-%m-%d"),
-        )
-        return FormattedTableCell(
-            display=display,
-            align=column.align,
-            color=cls.resolve_color(value, column),
-        )
+        """Build the display text, alignment and numeric tone."""
+        date_format = column.date_format or ("%Y-%m-%d %H:%M" if column.format == "datetime" else "%Y-%m-%d")
+        display = ValueFormatter.format(value, format_type=column.format, decimals=column.decimals, currency=column.currency, date_format=date_format)
+        return FormattedTableCell(display=display, align=column.align, tone=cls.resolve_tone(value, column))
 
     @staticmethod
-    def resolve_color(value, column):
-        """
-        Resolve financial colors for numeric values.
-        """
+    def resolve_tone(value, column):
+        """Return 'negative' or 'positive' for signed numeric values."""
         if column.format not in {"number", "currency"} or value is None:
             return None
 
@@ -44,8 +28,8 @@ class TableCellFormatter:
         if not number.is_finite():
             return None
         if number < 0:
-            return "#dc2626"
+            return "negative"
         if number > 0:
-            return "#059669"
+            return "positive"
 
         return None

@@ -2,7 +2,7 @@ from ...components.document import Report
 from ...rendering.context import RenderingContext
 from ..base import BaseExporter
 from .engine import HtmlRenderingEngine
-from .page_resolver import HtmlPageResolver
+from .page import HtmlPageResolver
 
 
 class HtmlExporter(BaseExporter):

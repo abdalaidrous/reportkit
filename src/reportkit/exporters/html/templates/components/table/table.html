@@ -1,80 +1,32 @@
 <div class="rk-table-container">
-    <table
-        class="rk-table
-        {% if table_style.bordered %}rk-table--bordered{% endif %}
-        {% if table_style.striped %}rk-table--striped{% endif %}
-        {% if table_style.hover %}rk-table--hover{% endif %}
-        {% if table_style.compact %}rk-table--compact{% endif %}
-        {% if table_style.repeat_header %}rk-table--repeat-header{% endif %}
-        {% if table_style.avoid_row_break %}rk-table--avoid-row-break{% endif %}
-        {% if table_style.ruled %}rk-table--ruled{% endif %}
-        rk-table--layout-{{ table_style.layout }}"
-        {% if style %}style="{{ style }}"{% endif %}
-    >
-
-        {% if header %}
-        <caption class="rk-table-caption">{{ header }}</caption>
-        {% endif %}
-
+    <table class="{{ table_class }}"{% if style %} style="{{ style }}"{% endif %}>
+        {% if caption %}<caption class="rk-table-caption">{{ caption }}</caption>{% endif %}
         <colgroup>
-            {% for column in columns %}
-            <col{% if column.width %} style="width: {{ column.width }}"{% endif %}>
-            {% endfor %}
+            {% for column in columns %}<col{% if column.width %} style="width: {{ column.width }}"{% endif %}>{% endfor %}
         </colgroup>
-
-        {% if table_style.show_header %}
+        {% if show_header %}
         <thead>
             <tr>
-                {% for column in columns %}
-                <th scope="col" style="text-align: {{ column.header_align or column.align }}">
-                    <span class="rk-table-th__title">{{ column.title }}</span>
-                    {%- if column.subtitle %}
-                    <span class="rk-table-th__subtitle">{{ column.subtitle }}</span>
-                    {%- endif %}
+                {% for th in header %}
+                <th scope="col" class="rk-table-th{% if th.nowrap %} rk-table-th--nowrap{% endif %}" style="text-align: {{ th.align }}">
+                    <span class="rk-table-th__title">{{ th.title }}</span>
+                    {%- if th.subtitle %}<span class="rk-table-th__subtitle">{{ th.subtitle }}</span>{% endif %}
                 </th>
                 {% endfor %}
             </tr>
         </thead>
         {% endif %}
-
         <tbody>
             {% for row in rows %}
-            <tr class="rk-table-{{ row.kind }}"{% if row.style %} style="{{ row.style }}"{% endif %}>
-                {% for cell in row.cells %}
-                <td
-                    {% if cell.colspan > 1 %}colspan="{{ cell.colspan }}"{% endif %}
-                    {% if cell.rowspan > 1 %}rowspan="{{ cell.rowspan }}"{% endif %}
-                    {% if cell.nowrap %}class="rk-table-cell--nowrap"{% endif %}
-                    style="text-align: {{ cell.align }};{% if cell.style %} {{ cell.style }}{% endif %}"
-                >
-                    {%- if cell.content is not none %}
-                    <div class="rk-table-cell__content">{{ cell.content | safe }}</div>
-                    {%- else %}
-                    <span class="rk-table-cell__value">{{ cell.display }}</span>
-                    {%- endif %}
-                </td>
-                {% endfor %}
+            <tr class="{{ row.css_class }}"{% if row.style %} style="{{ row.style }}"{% endif %}>
+                {% for cell in row.cells %}{% include "components/table/cell.html" %}{% endfor %}
             </tr>
             {% endfor %}
         </tbody>
-
         {% if footer %}
         <tfoot>
-            <tr class="rk-table-total"{% if footer.style %} style="{{ footer.style }}"{% endif %}>
-                {% for cell in footer.cells %}
-                <td
-                    {% if cell.colspan > 1 %}colspan="{{ cell.colspan }}"{% endif %}
-                    {% if cell.rowspan > 1 %}rowspan="{{ cell.rowspan }}"{% endif %}
-                    {% if cell.nowrap %}class="rk-table-cell--nowrap"{% endif %}
-                    style="text-align: {{ cell.align }};{% if cell.style %} {{ cell.style }}{% endif %}"
-                >
-                    {%- if cell.content is not none %}
-                    <div class="rk-table-cell__content">{{ cell.content | safe }}</div>
-                    {%- else %}
-                    <span class="rk-table-cell__value">{{ cell.display }}</span>
-                    {%- endif %}
-                </td>
-                {% endfor %}
+            <tr class="{{ footer.css_class }}"{% if footer.style %} style="{{ footer.style }}"{% endif %}>
+                {% for cell in footer.cells %}{% include "components/table/cell.html" %}{% endfor %}
             </tr>
         </tfoot>
         {% endif %}

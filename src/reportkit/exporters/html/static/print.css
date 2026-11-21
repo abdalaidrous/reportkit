@@ -59,37 +59,6 @@
         display: none !important;
     }
 
-    .rk-table-container {
-        overflow: hidden;
-        border: 0;
-    }
-
-    .rk-table {
-        width: 100%;
-    }
-
-    .rk-table--repeat-header thead {
-        display: table-header-group;
-    }
-
-    .rk-table--avoid-row-break tbody tr {
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
-
-    .rk-table tfoot {
-        display: table-row-group;
-    }
-
-    .rk-table-group-header {
-        break-after: avoid;
-        page-break-after: avoid;
-    }
-
-    .rk-table-caption {
-        break-after: avoid;
-    }
-
     .rk-page {
         max-width: none;
         min-height: 0;

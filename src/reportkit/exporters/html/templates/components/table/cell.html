@@ -1,0 +1,7 @@
+<td class="{{ cell.css_class }}"{% if cell.colspan > 1 %} colspan="{{ cell.colspan }}"{% endif %}{% if cell.rowspan > 1 %} rowspan="{{ cell.rowspan }}"{% endif %}{% if cell.style %} style="{{ cell.style }}"{% endif %}>
+    {%- if cell.content is not none -%}
+    <div class="rk-table-cell__content">{{ cell.content | safe }}</div>
+    {%- else -%}
+    <span class="rk-table-cell__value">{{ cell.display }}</span>
+    {%- endif -%}
+</td>
