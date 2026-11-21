@@ -1,10 +1,10 @@
+from .....rendering.table import get_entries, header_text, place_cells
 from .....styles.style import Style
+from .....styles.table import get_row_style, table_styles
+from .....styles.tokens import token
 from .....validators.table.table import TableValidator
 from ...exceptions import ExcelExportError
-from ...styles import table_styles, token
-from .cells import get_entries, header_text, prepare_entry
-from .placement import place_cells
-from .styles import get_row_style
+from .cells import prepare_entry
 from .widths import get_widths, spans
 
 

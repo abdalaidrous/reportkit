@@ -1,4 +1,4 @@
-# ReportKit with PDF and Excel export: Python, WeasyPrint system libraries (Pango), openpyxl and Arabic/Latin fonts.
+# ReportKit with PDF, Excel and Word export: Python, WeasyPrint system libraries (Pango), openpyxl and Arabic/Latin fonts.
 FROM python:3.13-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -12,7 +12,7 @@ RUN apt-get update \
 WORKDIR /app
 COPY pyproject.toml README.md ./
 COPY src ./src
-RUN pip install -e ".[pdf,excel,test]"
+RUN pip install -e ".[pdf,excel,word,test]"
 
 COPY . .
 

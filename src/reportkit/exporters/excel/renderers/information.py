@@ -1,5 +1,5 @@
 from ....styles.style import Style
-from ..styles import token
+from ....styles.tokens import token
 
 
 class KeyValueRenderer:

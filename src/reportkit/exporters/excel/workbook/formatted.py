@@ -1,9 +1,10 @@
 from ....components.document import Page
+from ....styles.borders import edge_borders
 from ..renderers import FORMATTED_RENDERERS
 from ..renderers.base import Region
 from ..styles import pixels
 from ..values import cell_value
-from ..worksheet import GRID_COLUMNS, FormattedSheet, edge_borders
+from ..worksheet import GRID_COLUMNS, FormattedSheet
 
 
 class FormattedEngine:

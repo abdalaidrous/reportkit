@@ -8,9 +8,11 @@ from openpyxl.worksheet.cell_range import CellRange
 from openpyxl.worksheet.merge import MergedCellRange
 from openpyxl.worksheet.pagebreak import Break
 
+from ....styles.borders import edge_borders
 from ....styles.style import Style
-from ..styles import get_fill, get_side, pixels, token
-from .borders import edge_border, edge_borders, edge_style
+from ....styles.tokens import token
+from ..styles import get_fill, get_side, pixels
+from .borders import edge_border, edge_style
 from .cells import apply_style, check_limits, write_value
 from .constants import CHARACTER_WIDTH, GRID_COLUMNS, LINE_HEIGHT, PAPER_SIZES, SCREEN_WIDTH_SCALE
 from .page import content_width, millimetres

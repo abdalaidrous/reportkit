@@ -1,8 +1,8 @@
+from .....rendering.table import get_entries, header_text, place_cells
 from .....styles.style import Style
+from .....styles.table import table_styles
 from .....validators.table.table import TableValidator
-from ...styles import table_styles
-from .cells import get_entries, header_text, prepare_entry
-from .placement import place_cells
+from .cells import prepare_entry
 from .widths import width_characters
 
 

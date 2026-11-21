@@ -206,7 +206,7 @@ class TestTables:
 
     def test_overlapping_spans_are_refused(self):
         rows = [TableRow(cells=[TableCell(value="a"), TableCell(value="tall", rowspan=2)]), TableRow(cells=[TableCell(value="wide", colspan=2)])]
-        with pytest.raises(ExcelExportError, match="overlaps"):
+        with pytest.raises(ValueError, match="overlaps"):
             export(report(Table(columns=COLUMNS, rows=rows)))
 
     def test_long_duplicate_table_names_stay_valid(self):

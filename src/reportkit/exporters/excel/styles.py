@@ -5,35 +5,12 @@ from typing import NamedTuple
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
 from ...styles.style import Style
-from ..html.templates import HtmlTemplateEngine
+from ...styles.tokens import token
 from .exceptions import ExcelExportError
 
-TOKEN_PATTERN = re.compile(r"(--rk-[\w-]+)\s*:\s*([^;]+);")
+
 DEFAULT_FONT = "Arial"
 VERTICAL = {"top": "top", "middle": "center", "bottom": "bottom"}
-
-
-@cache
-def load_tokens():
-    """
-    Read the design tokens from tokens.css so Excel reuses the HTML visual identity.
-    """
-    raw = dict(TOKEN_PATTERN.findall((HtmlTemplateEngine().static_dir / "tokens.css").read_text(encoding="utf-8")))
-    return {name: resolve_token(value.strip(), raw) for name, value in raw.items()}
-
-
-def resolve_token(value, raw):
-    """
-    Resolve var(--name) references inside a token value.
-    """
-    return re.sub(r"var\((--rk-[\w-]+)\)", lambda match: resolve_token(raw[match.group(1)].strip(), raw), value)
-
-
-def token(name):
-    """
-    Return one design token value.
-    """
-    return load_tokens()[name]
 
 
 class CellFormat(NamedTuple):
@@ -151,24 +128,3 @@ def is_bold(weight):
     Return whether a CSS font weight is bold.
     """
     return weight == "bold" or (str(weight).isdigit() and int(weight) >= 600)
-
-
-def table_styles(base=Style()):
-    """
-    Build the table styles from the shared table tokens, on top of the table component style.
-    """
-    divider, frame, ruled = f"1px solid {token('--rk-table-divider-color')}", f"1px solid {token('--rk-table-frame-color')}", token("--rk-table-ruled-color")
-    return {
-        "cell": base.merge(Style(color=token("--rk-table-cell-color"), border_bottom=divider)),
-        "bordered": Style(border_left=divider, border_right=divider, border_top=divider, border_bottom=divider),
-        "header": base.merge(Style(background_color=token("--rk-table-header-bg"), color=token("--rk-table-header-color"), font_weight=700, border_top=f"1px solid {token('--rk-table-header-accent')}", border_bottom=f"2px solid {token('--rk-table-header-rule')}")),
-        "ruled": Style(border_top=f"1px solid {ruled}", border_bottom=f"2px solid {ruled}"),
-        "frame": Style(border_left=frame, border_right=frame, border_top=frame, border_bottom=frame),
-        "stripe": Style(background_color=token("--rk-table-stripe-bg")),
-        "total": Style(background_color=token("--rk-table-total-bg"), font_weight=700, border_top=f"2px solid {token('--rk-table-divider-color')}"),
-        "ruled-total": Style(font_weight=700, color=token("--rk-table-header-color"), border_top=f"2px solid {ruled}", border_bottom="0px none #ffffff"),
-        "subtotal": Style(background_color=token("--rk-table-subtotal-bg"), font_weight=600),
-        "group-header": Style(background_color=token("--rk-table-group-bg"), font_weight=700),
-        "data": Style(),
-        "compact": Style(font_size=token("--rk-font-xs")),
-    }

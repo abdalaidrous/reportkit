@@ -1,4 +1,4 @@
-from ..base import track_shares
+from .....rendering.tracks import track_shares
 
 
 class ColumnsRenderer:

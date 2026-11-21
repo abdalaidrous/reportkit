@@ -1,14 +1,11 @@
-from ..base import distribute, track_shares
-
-MIN_COLUMN_CHARACTERS = 12
+from .....rendering.tracks import column_tracks, distribute, track_shares
 
 
 def get_widths(component, engine, region):
     """
-    Share the region between the columns: declared widths first, the rest by header length like the HTML auto layout.
+    Share the region between the table columns in whole grid columns.
     """
-    tracks = [column.width or f"{max(len(column.title), len(column.subtitle or ''), MIN_COLUMN_CHARACTERS)}fr" for column in component.columns]
-    return distribute(track_shares(tracks, engine.sheet.content_pixels), region.width)
+    return distribute(track_shares(column_tracks(component.columns), engine.sheet.content_pixels), region.width)
 
 
 def spans(region, widths):

@@ -219,6 +219,19 @@ xlsx = ExcelExporter().export(document, context, ExcelOptions(mode="data", strea
 - للتقارير الضخمة (عشرات الآلاف من الصفوف فأكثر) استخدم `ExcelOptions(mode="data", streaming=True)`: ذاكرة شبه ثابتة (نحو 84 MB لـ 100 ألف صف).
 - غير مدعوم: `Chart` و`PageCount` (وهما بلا Renderer في HTML أيضًا)، والصور البعيدة وصور SVG.
 
+## تصدير Word
+
+```python
+from reportkit.exporters.word import WordExporter
+
+docx_bytes = WordExporter().export(document, context)
+```
+
+- python-docx اعتماد اختياري: `pip install -e ".[word]"`. البناء مثل Excel: `word/document` (المستند والمحرك)، `word/renderers` (table/ و layout/)، `word/styles`، `word/values`.
+- الشبكات (Grid/Row/InfoGrid) جداول بلا حدود، والصناديق المؤطرة جدول بخلية واحدة؛ RTL عبر `w:bidi` و`w:bidiVisual`.
+- Header/Footer المتكرر يذهب إلى رأس/تذييل صفحة Word، و`PageNumber` يستخدم حقول PAGE و NUMPAGES.
+- المنطق المشترك بين المصدّرين في `styles/tokens.py` و`styles/table.py` و`styles/borders.py` و`rendering/tracks.py` و`rendering/table.py`.
+
 ## التحقق
 
 ```powershell

@@ -1,6 +1,6 @@
 from ....components.typography import Heading
 from ....styles.style import Style
-from ..styles import token
+from ....styles.tokens import token
 from ..values import cell_value, component_text
 
 HEADING_SIZES = {1: "--rk-font-2xl", 2: "--rk-font-xl", 3: "--rk-font-lg"}
