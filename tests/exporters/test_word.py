@@ -123,6 +123,35 @@ def test_rows_are_consumed_lazily():
     assert len(export(document).tables[0].rows) == 201 and len(consumed) == 200
 
 
+def test_large_table_rows_are_spooled_in_order():
+    rows = (TableRow(values={"name": f"row {index}", "amount": index}) for index in range(1500))
+    table = export(report(Text(value="before"), movements(rows), Text(value="after"))).tables[0]
+    texts = [row.cells[0].text for row in table.rows]
+    assert texts[0] == "البيان\nDescription" and texts[-1] == "الإجمالي"
+    assert texts[1:-1] == [f"row {index}" for index in range(1500)]
+
+
+def test_row_spans_across_spooled_rows():
+    rows = [TableRow(values={"name": f"row {index}", "amount": index}) for index in range(450)]
+    rows[199] = TableRow(cells=[TableCell(value="tall", rowspan=3), TableCell(value="b")])
+    rows[200] = TableRow(cells=[TableCell(value="c")])
+    rows[201] = TableRow(cells=[TableCell(value="d")])
+    table = export(report(movements(rows))).tables[0]
+    assert len(table.rows) == 452
+    assert [table.rows[number].cells[0].text for number in (200, 201, 202)] == ["tall"] * 3
+    assert table.rows[202].cells[1].text == "d" and table.rows[203].cells[0].text == "row 202"
+
+
+def test_export_to_path_and_stream(tmp_path):
+    document = report(movements((TableRow(values={"name": f"row {index}", "amount": index}) for index in range(300))))
+    path = tmp_path / "report.docx"
+    WordExporter().export_to(document, path)
+    assert len(docx.Document(path).tables[0].rows) == 302
+    stream = BytesIO()
+    WordExporter().export_to(report(movements()), stream)
+    assert stream.getvalue().startswith(b"PK")
+
+
 def test_page_settings_and_page_numbers():
     document = export(report(Text(value="x"), PageNumber(format="Page {page} of {pages}"), orientation="landscape", margin_top="20mm", page_number_position="bottom-center"))
     section = document.sections[0]

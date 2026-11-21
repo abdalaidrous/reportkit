@@ -6,28 +6,55 @@ from ...styles.xml import child, set_attributes, set_borders
 
 class SpacerRenderer:
     """
-    Render vertical space as an empty paragraph of the requested height.
+    Render vertical spacing using an empty paragraph.
     """
 
     def render(self, component, context, engine, area):
         """
-        Add a paragraph whose line height is the spacer height.
+        Render a paragraph with the configured spacer height.
         """
-        if component.height:
-            paragraph = area.paragraph()
-            format_paragraph(paragraph, Style(), engine.direction)
-            set_attributes(child(paragraph._p.get_or_add_pPr(), "w:spacing"), line=round(component.height * 0.75 * 20), lineRule="exact")
+        if not component.height:
+            return
+
+        paragraph = area.paragraph()
+        format_paragraph(paragraph, Style(), engine.direction)
+        self.apply_height(paragraph, component.height)
+
+    @staticmethod
+    def apply_height(paragraph, height):
+        """
+        Apply the spacer height as an exact line height.
+        """
+        spacing = child(paragraph._p.get_or_add_pPr(), "w:spacing")
+        set_attributes(spacing, line=round(height * 0.75 * 20), lineRule="exact")
 
 
 class DividerRenderer:
     """
-    Render a horizontal rule as a paragraph bottom border.
+    Render a horizontal divider using a paragraph border.
     """
 
     def render(self, component, context, engine, area):
         """
-        Add an empty paragraph with the rule under it.
+        Render a paragraph with the configured bottom border.
         """
-        paragraph, style = area.paragraph(), Style(border_bottom=f"1px solid {token('--rk-color-border')}").merge(context.resolve_style(component))
+        style = self.get_style(component, context)
+        paragraph = area.paragraph()
+
         format_paragraph(paragraph, style, engine.direction)
+        self.apply_border(paragraph, style)
+
+    @staticmethod
+    def get_style(component, context):
+        """
+        Resolve the divider style with its default border.
+        """
+        border = f"1px solid {token('--rk-color-border')}"
+        return Style(border_bottom=border).merge(context.resolve_style(component))
+
+    @staticmethod
+    def apply_border(paragraph, style):
+        """
+        Apply the divider bottom border.
+        """
         set_borders(paragraph._p.get_or_add_pPr(), "w:pBdr", {"bottom": style.border_bottom})

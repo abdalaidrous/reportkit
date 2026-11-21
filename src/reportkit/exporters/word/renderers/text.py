@@ -4,37 +4,75 @@ from ....styles.tokens import token
 from ..styles.text import add_run, format_paragraph, write_paragraph
 from ..values import component_text
 
+
 HEADING_SIZES = {1: "--rk-font-2xl", 2: "--rk-font-xl", 3: "--rk-font-lg"}
 
 
 class TextRenderer:
     """
-    Render Text and Heading as one paragraph, and RichText as one paragraph of styled runs.
+    Render Text, Heading, and RichText components.
     """
 
     def render(self, component, context, engine, area):
         """
-        Write the paragraph into the area.
+        Render the component with its resolved style.
         """
         style = self.get_style(component, context)
-        if isinstance(component, RichText):
-            return self.render_spans(component, area.paragraph(), style, engine.direction)
-        write_paragraph(area.paragraph(), component_text(component), style, engine.direction)
 
-    def render_spans(self, component, paragraph, style, direction):
-        """
-        Write each RichText span as its own run with its style and direction.
-        """
-        format_paragraph(paragraph, style.merge(Style(text_align=component.align)), direction)
-        for span in component.spans:
-            add_run(paragraph, span.value, style.merge(span.style), span.direction if span.direction in ("ltr", "rtl") else direction)
+        if isinstance(component, RichText):
+            return self.render_spans(component, area, style, engine.direction)
+
+        self.render_text(component, area, style, engine.direction)
 
     @staticmethod
-    def get_style(component, context):
+    def render_text(component, area, style, direction):
         """
-        Use the component style, with the heading defaults for headings.
+        Render a text or heading paragraph.
+        """
+        write_paragraph(area.paragraph(), component_text(component), style, direction)
+
+    def render_spans(self, component, area, style, direction):
+        """
+        Render rich text spans with their individual styles.
+        """
+        paragraph = area.paragraph()
+        self.format_spans(paragraph, component, style, direction)
+
+        for span in component.spans:
+            self.render_span(paragraph, span, style, direction)
+
+    @staticmethod
+    def format_spans(paragraph, component, style, direction):
+        """
+        Format the rich text paragraph.
+        """
+        format_paragraph(paragraph, style.merge(Style(text_align=component.align)), direction)
+
+    @staticmethod
+    def render_span(paragraph, span, style, direction):
+        """
+        Render a single rich text span.
+        """
+        span_style = style.merge(span.style)
+        span_direction = span.direction if span.direction in ("ltr", "rtl") else direction
+        add_run(paragraph, span.value, span_style, span_direction)
+
+    @classmethod
+    def get_style(cls, component, context):
+        """
+        Resolve the component style with heading defaults.
         """
         style = context.resolve_style(component)
+
         if isinstance(component, Heading):
-            return Style(font_weight=700, font_size=token(HEADING_SIZES.get(component.level, "--rk-font-md"))).merge(style)
+            return cls.get_heading_style(component, style)
+
         return style
+
+    @staticmethod
+    def get_heading_style(component, style):
+        """
+        Apply the default heading font size and weight.
+        """
+        font_size = token(HEADING_SIZES.get(component.level, "--rk-font-md"))
+        return Style(font_weight=700, font_size=font_size).merge(style)

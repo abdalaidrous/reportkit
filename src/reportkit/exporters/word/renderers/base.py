@@ -5,13 +5,14 @@ from docx.table import _Cell
 
 from ..styles.xml import child, set_attributes
 
+
 COLLAPSED_LINE = 20
 
 
 @dataclass
 class Area:
     """
-    Describe where a renderer writes: a container (document body, table cell, page header or footer) and its width.
+    Manage the rendering area for document bodies, cells, headers, and footers.
     """
 
     container: object
@@ -20,37 +21,61 @@ class Area:
 
     def paragraph(self):
         """
-        Return a new paragraph, reusing the empty one Word puts in every new table cell.
+        Create a paragraph or reuse the initial empty cell paragraph.
         """
         if self.fresh:
             self.fresh = False
             return self.container.paragraphs[0]
+
         return self.container.add_paragraph()
 
     def table(self, rows, columns):
         """
-        Add a table; inside a cell the empty paragraphs Word requires around it are removed or collapsed.
+        Create a table and manage surrounding cell paragraphs.
         """
-        if self.fresh:
-            paragraph = self.container.paragraphs[0]._p
-            paragraph.getparent().remove(paragraph)
-        self.fresh = False
-        if isinstance(self.container, (_Header, _Footer)):
-            return self.container.add_table(rows, columns, self.width)
-        table = self.container.add_table(rows, columns)
-        if isinstance(self.container, _Cell):
-            collapse(self.container.paragraphs[-1])
+        self.remove_initial_paragraph()
+        table = self.create_table(rows, columns)
+        self.collapse_cell_paragraph()
         return table
 
-    def cell(self, cell, width):
+    def remove_initial_paragraph(self):
         """
-        Return the area of a table cell.
+        Remove the initial empty paragraph when the area is fresh.
+        """
+        if not self.fresh:
+            return
+
+        paragraph = self.container.paragraphs[0]._p
+        paragraph.getparent().remove(paragraph)
+        self.fresh = False
+
+    def create_table(self, rows, columns):
+        """
+        Create a table with the required container arguments.
+        """
+        if isinstance(self.container, (_Header, _Footer)):
+            return self.container.add_table(rows, columns, self.width)
+
+        return self.container.add_table(rows, columns)
+
+    def collapse_cell_paragraph(self):
+        """
+        Collapse the closing paragraph after a table inside a cell.
+        """
+        if isinstance(self.container, _Cell):
+            collapse(self.container.paragraphs[-1])
+
+    @staticmethod
+    def cell(cell, width):
+        """
+        Create a rendering area for a table cell.
         """
         return Area(cell, width, fresh=True)
 
 
 def collapse(paragraph):
     """
-    Shrink the closing paragraph Word requires after a table in a cell to almost nothing.
+    Collapse the required closing paragraph after a table.
     """
-    set_attributes(child(paragraph._p.get_or_add_pPr(), "w:spacing"), before=0, after=0, line=COLLAPSED_LINE, lineRule="exact")
+    spacing = child(paragraph._p.get_or_add_pPr(), "w:spacing")
+    set_attributes(spacing, before=0, after=0, line=COLLAPSED_LINE, lineRule="exact")
