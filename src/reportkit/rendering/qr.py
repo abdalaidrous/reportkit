@@ -1,18 +1,7 @@
 import math
 from io import BytesIO
 
-SEGNO_HELP = 'QRCode requires segno. Install it with: pip install "pyreportkit[qr]"'
-
-
-def load_segno():
-    """
-    Import segno lazily so it stays an optional dependency, with a clear message when it is missing.
-    """
-    try:
-        import segno
-    except ImportError as error:
-        raise ImportError(SEGNO_HELP) from error
-    return segno
+import segno
 
 
 class QRCodeImage:
@@ -25,7 +14,7 @@ class QRCodeImage:
         Encode the value at the declared error correction level, never raised silently.
         """
         self.component = component
-        self.symbol = load_segno().make(component.value, error=component.error_correction.lower(), micro=False, boost_error=False)
+        self.symbol = segno.make(component.value, error=component.error_correction.lower(), micro=False, boost_error=False)
 
     def svg_data_uri(self):
         """

@@ -12,7 +12,7 @@ RUN apt-get update \
 WORKDIR /app
 COPY pyproject.toml README.md ./
 COPY src ./src
-RUN pip install -e ".[pdf,excel,word,qr,test]"
+RUN pip install -e ".[pdf,excel,word,test]"
 
 COPY . .
 

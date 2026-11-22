@@ -1,2 +1,3 @@
-# Core runtime dependency (HTML export). Keep in sync with [project.dependencies] in pyproject.toml.
+# Core runtime dependencies (HTML export and QR codes). Keep in sync with [project.dependencies] in pyproject.toml.
 Jinja2>=3.1
+segno>=1.6
