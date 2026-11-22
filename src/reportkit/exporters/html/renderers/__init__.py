@@ -1,7 +1,7 @@
 from ....components.document import Footer, Header, Page, Report
 from ....components.information import InfoGrid, KeyValue
 from ....components.layout import Box, Column, Divider, Grid, Row, Section, Spacer
-from ....components.media import Image, QRCode
+from ....components.media import Chart, Image, QRCode
 from ....components.table import Table
 from ....components.typography import Heading, RichText, Text
 from ....components.pagination import PageBreak, PageCount, PageNumber
@@ -9,7 +9,7 @@ from ..registry import HtmlRendererRegistry
 from .document import FooterRenderer, HeaderRenderer, PageRenderer, ReportRenderer
 from .information import InfoGridRenderer, KeyValueRenderer
 from .layout import BoxRenderer, ColumnRenderer, DividerRenderer, GridRenderer, RowRenderer, SectionRenderer, SpacerRenderer
-from .media import ImageRenderer, QRCodeRenderer
+from .media import ChartRenderer, ImageRenderer, QRCodeRenderer
 from .pagination import PageBreakRenderer, PageCountRenderer, PageNumberRenderer
 from .table import TableRenderer
 from .typography import HeadingRenderer, RichTextRenderer, TextRenderer
@@ -29,6 +29,7 @@ HtmlRendererRegistry.register(Divider, DividerRenderer)
 HtmlRendererRegistry.register(Table, TableRenderer)
 HtmlRendererRegistry.register(Image, ImageRenderer)
 HtmlRendererRegistry.register(QRCode, QRCodeRenderer)
+HtmlRendererRegistry.register(Chart, ChartRenderer)
 HtmlRendererRegistry.register(KeyValue, KeyValueRenderer)
 HtmlRendererRegistry.register(InfoGrid, InfoGridRenderer)
 HtmlRendererRegistry.register(Text, TextRenderer)

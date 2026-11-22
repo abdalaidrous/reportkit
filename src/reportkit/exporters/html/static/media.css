@@ -14,3 +14,46 @@
     max-width: 100%;
     image-rendering: pixelated;
 }
+
+.rk-chart {
+    margin: 0 0 var(--rk-space-4);
+    max-width: 100%;
+    break-inside: avoid;
+}
+
+.rk-chart__title {
+    margin-bottom: var(--rk-space-2);
+    color: var(--rk-color-text);
+    font-size: var(--rk-font-md);
+    font-weight: 700;
+}
+
+.rk-chart__drawing {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.rk-chart__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--rk-space-1) var(--rk-space-4);
+    margin: var(--rk-space-2) 0 0;
+    padding: 0;
+    list-style: none;
+    color: var(--rk-chart-label-color);
+    font-size: var(--rk-chart-label-size);
+}
+
+.rk-chart__legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rk-space-1);
+}
+
+.rk-chart__swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+}

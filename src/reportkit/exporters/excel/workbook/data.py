@@ -12,7 +12,7 @@ class DataEngine:
         """
         Prepare lazy sheet creation.
         """
-        self.workbook, self.direction, self.options, self.information, self.tables = workbook, context.direction, workbook.options, None, 0
+        self.workbook, self.direction, self.options, self.information, self.tables, self.charts = workbook, context.direction, workbook.options, None, 0, 0
 
     def write(self, document, context):
         """
@@ -40,6 +40,13 @@ class DataEngine:
         """
         self.tables += 1
         return DataSheet(self.workbook.create_sheet(table.header or f"Table {self.tables}"), self.direction)
+
+    def chart_sheet(self, chart):
+        """
+        Create the sheet for one chart, named after its title.
+        """
+        self.charts += 1
+        return DataSheet(self.workbook.create_sheet(chart.title or f"Chart {self.charts}"), self.direction)
 
     def value(self, value):
         """

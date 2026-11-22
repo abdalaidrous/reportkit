@@ -4,7 +4,9 @@ from ..renderers import FORMATTED_RENDERERS
 from ..renderers.base import Region
 from ..styles import pixels
 from ..values import cell_value
-from ..worksheet import GRID_COLUMNS, FormattedSheet
+from ..worksheet import GRID_COLUMNS, DataSheet, FormattedSheet
+
+CHART_DATA_SHEET = "Chart data"
 
 
 class FormattedEngine:
@@ -18,6 +20,7 @@ class FormattedEngine:
         """
         page = next(find_components(document, Page), None)
         self.sheet, self.options = FormattedSheet(workbook.create_sheet(workbook.options.sheet_name), context.direction, page), workbook.options
+        self.workbook, self.direction, self.chart_values = workbook, context.direction, None
 
     def write(self, document, context):
         """
@@ -45,6 +48,16 @@ class FormattedEngine:
             return 0
         self.sheet.set_row_height(row, pixels(margin) * 0.75)
         return 1
+
+    def chart_data(self):
+        """
+        Return the hidden sheet that holds the values charts read, created on first use.
+        """
+        if self.chart_values is None:
+            worksheet = self.workbook.create_sheet(CHART_DATA_SHEET)
+            worksheet.sheet_state = "hidden"
+            self.chart_values = DataSheet(worksheet, self.direction)
+        return self.chart_values
 
     def value(self, value):
         """

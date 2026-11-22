@@ -5,6 +5,7 @@ Example 3 — one report, every format: TableBuilder with native values, lazily 
   while Excel keeps them as real numbers and dates.
 - fetch_movements() is a generator standing in for a database cursor: rows are read one at a time, never loaded
   into a list. A generator is read once, so the report is rebuilt for each export.
+- QRCode encodes a prepared value (here a verification link) as a sharp SVG in HTML/PDF and a PNG in Excel/Word.
 - repeat=True puts the header and footer on every printed page (PDF and Word). They print inside the page
   margins, so they stay short (brand_line) and the top and bottom margins leave room for them.
 
@@ -21,6 +22,8 @@ from decimal import Decimal
 from pathlib import Path
 
 from reportkit.builders import ReportBuilder, TableBuilder
+from reportkit.components.layout import Grid
+from reportkit.components.media import QRCode
 from reportkit.components.typography import Text
 from reportkit.exporters.excel import ExcelOptions
 from reportkit.rendering.context import RenderingContext
@@ -39,6 +42,7 @@ RECORDS = [
     ('000001', datetime(2026, 11, 13, 23, 39), 'دفعة الحجز رقم 1', 'تمارا', Decimal('100.00')),
 ]
 TOTAL = {'voucher': 'الإجمالي', 'amount': Decimal('400.00')}  # Summed by the application, not by ReportKit.
+VERIFICATION_URL = 'https://example.com/reports/financial-movement/2026-11-14'
 
 
 def fetch_movements():
@@ -68,6 +72,14 @@ def movements_table():
     )
 
 
+def verification():
+    """
+    A QR code beside its caption: scanning it opens the link the application prepared.
+    """
+    caption = Text(value='امسح الرمز للتحقق من التقرير — Scan to verify', style=Style(font_size=11, color='#555555'))
+    return Grid(columns='1fr auto', style=Style(margin_top=14), children=[caption, QRCode(value=VERIFICATION_URL, size=88, alt='Report verification QR code')])
+
+
 def report_builder():
     """
     The header and footer repeat on every page, inside the page margins: keep them short and the margins tall enough.
@@ -79,6 +91,7 @@ def report_builder():
         .footer(Text(value='تقرير آلي — ReportKit', style=Style(font_size=8, color='#777777', text_align='center')), repeat=True)
         .add(report_title('Financial Movement Report', 'تقرير الحركة المالية'))
         .add(movements_table())
+        .add(verification())
         .page_number('Page {page} of {pages}')
     )
 

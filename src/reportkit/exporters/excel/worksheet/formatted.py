@@ -122,6 +122,13 @@ class FormattedSheet:
         self.worksheet.add_image(image, f"{get_column_letter(column + offset)}{row}")
         return image.height
 
+    def add_chart(self, chart, row, column, width, chart_width):
+        """
+        Anchor a chart centred in a block of columns.
+        """
+        offset = max(0, (width - math.ceil(chart_width / self.unit_pixels)) // 2)
+        self.worksheet.add_chart(chart, f"{get_column_letter(column + offset)}{row}")
+
     def add_page_break(self, row):
         """
         Start a new printed page after the given row.
