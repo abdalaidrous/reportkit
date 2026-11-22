@@ -4,7 +4,8 @@ from typing import BinaryIO
 
 from ..components.document import Footer, Header, Page, Report
 from ..components.layout import Spacer
-from ..components.pagination import PageBreak, PageNumber
+from ..components.media import Chart, ChartSeries, QRCode
+from ..components.pagination import PageBreak, PageCount, PageNumber
 from ..components.table import TableColumn
 from ..core.component import Component
 from ..rendering.context import RenderingContext
@@ -98,6 +99,24 @@ class ReportBuilder:
         Append a forced page break.
         """
         return self.add(PageBreak())
+
+    def chart(self, labels: list[str], series: Iterable[ChartSeries], *, chart_type: str = "bar", **options) -> "ReportBuilder":
+        """
+        Append a bar, line or pie chart of prepared values; options are the other Chart fields (title, width, ...).
+        """
+        return self.add(Chart(labels=list(labels), series=list(series), chart_type=chart_type, **options))
+
+    def qr_code(self, value: str, **options) -> "ReportBuilder":
+        """
+        Append a QR code of a prepared value; options are the other QRCode fields (size, error_correction, ...).
+        """
+        return self.add(QRCode(value=value, **options))
+
+    def page_count(self, format: str = "{pages}", *, style: Style | None = None) -> "ReportBuilder":
+        """
+        Append a line with the total number of printed pages.
+        """
+        return self.add(PageCount(format=format, style=style or Style()))
 
     def page_number(self, format: str = "Page {page} of {pages}") -> "ReportBuilder":
         """

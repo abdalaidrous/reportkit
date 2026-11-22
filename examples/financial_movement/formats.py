@@ -22,7 +22,7 @@ from decimal import Decimal
 from pathlib import Path
 
 from reportkit.builders import ReportBuilder, TableBuilder
-from reportkit.components.layout import Grid
+from reportkit.components.layout import Row
 from reportkit.components.media import QRCode
 from reportkit.components.typography import Text
 from reportkit.exporters.excel import ExcelOptions
@@ -77,7 +77,7 @@ def verification():
     A QR code beside its caption: scanning it opens the link the application prepared.
     """
     caption = Text(value='امسح الرمز للتحقق من التقرير — Scan to verify', style=Style(font_size=11, color='#555555'))
-    return Grid(columns='1fr auto', style=Style(margin_top=14), children=[caption, QRCode(value=VERIFICATION_URL, size=88, alt='Report verification QR code')])
+    return Row(justify='space-between', align='center', gap='12px', style=Style(margin_top=14), children=[caption, QRCode(value=VERIFICATION_URL, size=88, alt='Report verification QR code')])
 
 
 def report_builder():

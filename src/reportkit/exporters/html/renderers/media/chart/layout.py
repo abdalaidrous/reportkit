@@ -3,11 +3,13 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from ......formatting.values import ValueFormatter
+from ....direction import text_direction
 
 TICKS = 5
 LABEL_SIZE = 11
 CHARACTER_WIDTH = 0.6  # Average glyph width as a share of the font size, to keep axis labels apart.
 BAND_FILL = 0.7
+LABEL_BOX = 160  # Width of the box a label is aligned in, wider than any axis label.
 PIE_LABEL_MINIMUM = 0.04  # Slices smaller than this share keep their value in the legend only.
 
 
@@ -26,6 +28,23 @@ class Label:
     y: float
     text: str
     anchor: str = "middle"
+    tone: str = "label"
+
+    def box(self, width, height):
+        """
+        Place the label as an HTML box over the drawing, in percentages so it follows the drawing when it scales:
+        SVG text is not shaped for Arabic by every renderer, HTML text is.
+        """
+        left = {"end": self.x - LABEL_BOX, "start": self.x}.get(self.anchor, self.x - LABEL_BOX / 2)
+        return {
+            "left": percent(left, width),
+            "top": percent(self.y - LABEL_SIZE * 0.85, height),
+            "width": percent(LABEL_BOX, width),
+            "align": {"end": "right", "start": "left"}.get(self.anchor, "center"),
+            "dir": text_direction(self.text) or "ltr",
+            "text": self.text,
+            "tone": self.tone,
+        }
 
 
 @dataclass(frozen=True)
@@ -91,7 +110,8 @@ class CartesianLayout:
         self.chart, self.colors = chart, colors
         values = [float(value) for series in chart.series for value in series.values]
         top = LABEL_SIZE * 2 if chart.show_values else LABEL_SIZE
-        bottom = chart.height - LABEL_SIZE * 2.4
+        below = chart.show_values and min(values) < 0  # Room for the labels under negative values.
+        bottom = chart.height - LABEL_SIZE * (3.6 if below else 2.4)
         self.scale = ValueScale(values, top, bottom, chart.decimals)
         ticks = self.scale.ticks()
         self.left = max(text_width(label) for _, label in ticks) + LABEL_SIZE
@@ -163,6 +183,12 @@ class CartesianLayout:
         """
         return ValueFormatter.number(value, self.chart.decimals)
 
+    def labels(self):
+        """
+        Return every text of the chart: axis ticks, values and categories.
+        """
+        return self.ticks + self.values() + self.categories()
+
 
 class PieLayout:
     """
@@ -204,7 +230,7 @@ class PieLayout:
             share = float(value / self.total)
             if share >= PIE_LABEL_MINIMUM:
                 x, y = self.point(start + share / 2, self.radius * 0.65)
-                labels.append(Label(x, y + LABEL_SIZE * 0.35, ValueFormatter.number(share * 100, self.chart.decimals) + "%"))
+                labels.append(Label(x, y + LABEL_SIZE * 0.35, ValueFormatter.number(share * 100, self.chart.decimals) + "%", tone="inverse"))
             start += share
         return labels
 
@@ -230,6 +256,13 @@ class PieLayout:
         """
         angle = 2 * math.pi * share - math.pi / 2
         return self.cx + radius * math.cos(angle), self.cy + radius * math.sin(angle)
+
+
+def percent(value, total):
+    """
+    Return a length as a CSS percentage of the drawing size.
+    """
+    return f"{value / total * 100:.3f}%"
 
 
 def nice_step(raw):

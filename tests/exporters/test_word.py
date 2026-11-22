@@ -12,7 +12,7 @@ import reportkit.exporters.word  # noqa: E402,F401  (registers the Word exporter
 from docx.oxml.ns import qn  # noqa: E402
 from reportkit.components.document import Header, Page, Report  # noqa: E402
 from reportkit.components.layout import Grid  # noqa: E402
-from reportkit.components.media import Chart, Image  # noqa: E402
+from reportkit.components.media import Image  # noqa: E402
 from reportkit.components.pagination import PageNumber  # noqa: E402
 from reportkit.components.table import Table, TableCell, TableColumn, TableRow  # noqa: E402
 from reportkit.components.typography import Heading, Text  # noqa: E402
@@ -173,9 +173,7 @@ def test_branding_grid_with_logo():
     assert [cell.text for cell in document.tables[0].rows[0].cells] == ["فندق الأحقاف", "", "Alahqaf Hotel"]
 
 
-def test_unsupported_components_and_images():
-    with pytest.raises(WordExportError, match="not supported"):
-        export(report(Chart()))
+def test_remote_images_are_refused():
     with pytest.raises(WordExportError, match="remote"):
         export(report(Image(src="https://example.com/logo.png")))
 

@@ -28,10 +28,28 @@
     font-weight: 700;
 }
 
+.rk-chart__canvas {
+    position: relative;
+}
+
 .rk-chart__drawing {
     display: block;
-    max-width: 100%;
+    width: 100%;
     height: auto;
+}
+
+.rk-chart__label {
+    position: absolute;
+    color: var(--rk-chart-label-color);
+    font-size: var(--rk-chart-label-size);
+    line-height: 1;
+    white-space: nowrap;
+    unicode-bidi: isolate;
+}
+
+.rk-chart__label--inverse {
+    color: #ffffff;
+    font-weight: 700;
 }
 
 .rk-chart__legend {
@@ -47,6 +65,7 @@
 
 .rk-chart__legend-item {
     display: inline-flex;
+    white-space: nowrap;
     align-items: center;
     gap: var(--rk-space-1);
 }

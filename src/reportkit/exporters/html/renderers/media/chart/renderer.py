@@ -6,7 +6,8 @@ from .layout import CartesianLayout, PieLayout
 
 class ChartRenderer(BaseHtmlRenderer):
     """
-    Render a chart as inline SVG drawn at export time, so browsers and the PDF show it without scripts.
+    Render a chart as inline SVG shapes drawn at export time, with its texts as HTML laid over them, so browsers and
+    the PDF show it without scripts and shape Arabic labels correctly.
     """
 
     template_name = "components/media/chart.html"
@@ -24,12 +25,6 @@ class ChartRenderer(BaseHtmlRenderer):
     @staticmethod
     def theme():
         """
-        Return the resolved chart colors and font: SVG drawn by WeasyPrint does not read CSS variables.
+        Return the resolved line colors: SVG drawn by WeasyPrint does not read CSS variables.
         """
-        return {
-            "font": token("--rk-font-family"),
-            "axis": token("--rk-chart-axis-color"),
-            "grid": token("--rk-chart-grid-color"),
-            "label": token("--rk-chart-label-color"),
-            "size": token("--rk-chart-label-size"),
-        }
+        return {"axis": token("--rk-chart-axis-color"), "grid": token("--rk-chart-grid-color")}

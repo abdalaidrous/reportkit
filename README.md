@@ -10,7 +10,7 @@ out, styles them and exports them. It never computes or aggregates report data.
 ## Installation
 
 ```bash
-pip install pyreportkit           # HTML export
+pip install pyreportkit           # HTML export (and QR codes, through segno)
 pip install "pyreportkit[pdf]"    # + PDF (WeasyPrint)
 pip install "pyreportkit[excel]"  # + Excel (openpyxl, Pillow)
 pip install "pyreportkit[word]"   # + Word (python-docx)
@@ -68,6 +68,9 @@ report = builder.build()                                 # or the Report, for an
 | `.add(*components)` | Any components, in order. |
 | `.table(columns, rows, totals=, title=, style=, table_style=)` | A table of prepared rows (mappings or `TableRow`) and an optional prepared totals row. |
 | `.spacer(height)` / `.page_break()` | Vertical space / a forced page break. |
+| `.chart(labels, series, chart_type="bar", title=, ...)` | A bar, line or pie chart of prepared values (`ChartSeries`). |
+| `.qr_code(value, size=96, error_correction="M", ...)` | A QR code of a prepared value, such as a link or an invoice number. |
+| `.page_count(format="{pages}")` | A line with the total number of printed pages, for example `"Total pages: {pages}"`. |
 | `.footer(*components, repeat=False)` | The footer. `repeat=True` prints it on every page. |
 | `.page_number(format)` | Page numbers in print and PDF, at `page_number_position`. |
 | `.build()` | Returns the `Report`. |
@@ -201,11 +204,17 @@ from reportkit.exporters.excel import ExcelExporter, ExcelOptions
 
 xlsx = ExcelExporter().export(report, context)                                              # looks like the PDF
 xlsx = ExcelExporter().export(report, context, ExcelOptions(mode="data", streaming=True))   # one typed sheet per table
+ExcelExporter().export_to(report, "report.xlsx", context, ExcelOptions(mode="data", streaming=True))  # or a binary stream
 ```
+
+`export_to` builds the workbook in a temporary file and copies it to the target, so a large streamed report never sits in
+memory as a whole.
 
 - `formatted` (default): one printable sheet with merged cells, colors, borders, logo, RTL and print settings.
 - `data`: analysis-ready sheets with real numbers and dates, frozen headers and AutoFilter. With `streaming=True` memory
   stays flat, which is the right choice for very large reports.
+- Charts are native Excel charts: their values go to a hidden "Chart data" sheet (`formatted`) or to the chart's own sheet
+  beside the chart (`data`). `PageCount` goes to the right section of the printed footer.
 - Values are written as they arrive: no formulas, text is always stored as text (formula injection safe), and decimals
   beyond Excel's 15 significant digits raise an error unless `decimal_policy="text"`.
 
@@ -219,7 +228,8 @@ WordExporter().export_to(report, "report.docx", context)   # or a binary stream
 ```
 
 Tables repeat their header row on every page, repeating headers and footers go to the Word page header and footer, and
-page numbers use Word's PAGE and NUMPAGES fields.
+page numbers and `PageCount` use Word's PAGE and NUMPAGES fields. python-docx cannot draw charts, so a `Chart` is written
+as the table of its values; QR codes are PNG pictures.
 
 Large tables keep memory flat: rows may be a lazy iterator, and finished rows of tables placed in the document body are
 moved to temporary storage (memory, then disk) and streamed back into the file on save. 10,000 rows take about 43 s and
@@ -243,8 +253,28 @@ exporter = ExporterRegistry.get("xlsx")()   # "html", "pdf", "excel"/"xlsx", "wo
 | Typography | `Text`, `Heading`, `RichText`, `TextSpan` |
 | Tables | `Table`, `TableColumn`, `TableRow`, `TableCell`, `TableStyle` |
 | Information | `KeyValue`, `InfoGrid` |
-| Media | `Image` |
-| Pagination | `PageBreak`, `PageNumber` |
+| Media | `Image`, `QRCode`, `Chart`, `ChartSeries` |
+| Pagination | `PageBreak`, `PageNumber`, `PageCount` |
+
+### QR codes, charts and page counts
+
+```python
+from reportkit.components.media import Chart, ChartSeries, QRCode
+from reportkit.components.pagination import PageCount
+
+QRCode(value="https://example.com/inv/1001", size=88, error_correction="M", quiet_zone=2, alt="Invoice link")
+Chart(title="Revenue", labels=["Jan", "Feb", "Mar"], series=[ChartSeries(name="2026", values=[1200, 3400, 900])],
+      chart_type="bar", show_values=True, decimals=0, width=640, height=280)
+PageCount(format="Total pages: {pages}")
+```
+
+- `QRCode` is a sharp SVG in HTML and PDF and a PNG in Excel and Word, always on a white background so it scans.
+- `Chart` draws prepared values (bar, line or pie; a pie shows one series): SVG shapes with HTML labels in HTML and
+  PDF, so Arabic labels are shaped correctly; series colors come from the `--rk-chart-*` tokens unless a series sets
+  `color`. ReportKit never computes the values.
+- `PageCount` needs a paged layout: it shows in PDF (in the content or in a repeating header or footer) and Word, not
+  in the browser. In a chunked PDF the line is laid out hidden and the merged total is stamped in its place.
+- Validation rules live in `reportkit.validators` (`media/`, `pagination/`, `table/`), not in the components.
 
 Styles are immutable `Style` objects; table colors and spacing come from CSS design tokens shared by every exporter.
 

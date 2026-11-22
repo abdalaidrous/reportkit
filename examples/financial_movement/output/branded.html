@@ -74,6 +74,18 @@
     --rk-table-compact-padding-y: 5px;
     --rk-table-compact-padding-x: 8px;
     --rk-table-caption-padding: var(--rk-space-4);
+
+    /* Charts: series colors in order, then the axis, grid and label colors. */
+    --rk-chart-1: var(--rk-accent);
+    --rk-chart-2: #d08c4a;
+    --rk-chart-3: #5f9e7a;
+    --rk-chart-4: #b5596b;
+    --rk-chart-5: #8a74b8;
+    --rk-chart-6: #4fa3a5;
+    --rk-chart-axis-color: var(--rk-gray-500);
+    --rk-chart-grid-color: var(--rk-gray-200);
+    --rk-chart-label-color: var(--rk-gray-600);
+    --rk-chart-label-size: var(--rk-font-xs);
 }
 
 *,
@@ -175,6 +187,10 @@ body {
 
 .rk-rich-text span[dir="ltr"] {
     direction: ltr;
+}
+
+.rk-page-count__text {
+    unicode-bidi: isolate;
 }
 
 
@@ -493,6 +509,74 @@ body {
     max-height: 90px;
 }
 
+.rk-qr-code {
+    display: block;
+    max-width: 100%;
+    image-rendering: pixelated;
+}
+
+.rk-chart {
+    margin: 0 0 var(--rk-space-4);
+    max-width: 100%;
+    break-inside: avoid;
+}
+
+.rk-chart__title {
+    margin-bottom: var(--rk-space-2);
+    color: var(--rk-color-text);
+    font-size: var(--rk-font-md);
+    font-weight: 700;
+}
+
+.rk-chart__canvas {
+    position: relative;
+}
+
+.rk-chart__drawing {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.rk-chart__label {
+    position: absolute;
+    color: var(--rk-chart-label-color);
+    font-size: var(--rk-chart-label-size);
+    line-height: 1;
+    white-space: nowrap;
+    unicode-bidi: isolate;
+}
+
+.rk-chart__label--inverse {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.rk-chart__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--rk-space-1) var(--rk-space-4);
+    margin: var(--rk-space-2) 0 0;
+    padding: 0;
+    list-style: none;
+    color: var(--rk-chart-label-color);
+    font-size: var(--rk-chart-label-size);
+}
+
+.rk-chart__legend-item {
+    display: inline-flex;
+    white-space: nowrap;
+    align-items: center;
+    gap: var(--rk-space-1);
+}
+
+.rk-chart__swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+}
+
 
 .rk-key-value {
     display: flex;
@@ -599,6 +683,11 @@ body {
 }
 
 .rk-page-break {
+    display: none;
+}
+
+/* The page total needs a paged layout: it is shown by pdf.css, never in the browser. */
+.rk-page-count {
     display: none;
 }
 

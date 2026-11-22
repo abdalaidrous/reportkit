@@ -14,7 +14,7 @@ import reportkit.exporters.html  # noqa: E402,F401
 from reportkit.components.document import Header, Page, Report  # noqa: E402
 from reportkit.components.information import KeyValue  # noqa: E402
 from reportkit.components.layout import Grid, Row  # noqa: E402
-from reportkit.components.media import Chart, Image  # noqa: E402
+from reportkit.components.media import Image  # noqa: E402
 from reportkit.components.pagination import PageCount, PageNumber  # noqa: E402
 from reportkit.components.table import Table, TableCell, TableColumn, TableRow, TableStyle  # noqa: E402
 from reportkit.components.typography import Heading, Text  # noqa: E402
@@ -275,11 +275,10 @@ class TestLayout:
         assert sheet.oddFooter.center.text == "Page &P of &N"
         assert sheet.print_area
 
-    def test_unsupported_components_fail_clearly(self):
-        for component in (Chart(), PageCount()):
-            for mode in ("formatted", "data"):
-                with pytest.raises(ExcelExportError, match="not supported"):
-                    export(report(component), mode=mode)
+    def test_page_count_goes_to_the_right_footer(self):
+        sheet = export(report(PageCount(format="Pages: {pages}"), PageNumber(format="{page}"))).active
+        assert sheet.oddFooter.right.text == "Pages: &N"
+        assert sheet.oddFooter.center.text == "&P"
 
     def test_image_errors(self):
         with pytest.raises(ExcelExportError, match="remote"):

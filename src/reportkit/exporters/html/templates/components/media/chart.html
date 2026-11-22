@@ -2,43 +2,37 @@
     {%- if component.title %}
     <figcaption class="rk-chart__title">{{ component.title }}</figcaption>
     {%- endif %}
-    <svg class="rk-chart__drawing" xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 {{ component.width }} {{ component.height }}" width="{{ component.width }}" height="{{ component.height }}" font-family="{{ theme.font }}" font-size="{{ theme.size }}" direction="ltr">
-        {%- if component.title %}<title>{{ component.title }}</title>{% endif %}
-        {%- if component.chart_type == "pie" %}
-        {%- for slice in layout.slices() %}
-        <path d="{{ slice.path }}" fill="{{ slice.color }}" stroke="#ffffff" stroke-width="1.5"/>
-        {%- endfor %}
+    <div class="rk-chart__canvas" style="max-width: {{ component.width }}px;">
+        <svg class="rk-chart__drawing" xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 {{ component.width }} {{ component.height }}" width="{{ component.width }}" height="{{ component.height }}">
+            {%- if component.title %}<title>{{ component.title }}</title>{% endif %}
+            {%- if component.chart_type == "pie" %}
+            {%- for slice in layout.slices() %}
+            <path d="{{ slice.path }}" fill="{{ slice.color }}" stroke="#ffffff" stroke-width="1.5"/>
+            {%- endfor %}
+            {%- else %}
+            {%- for y in layout.grid %}
+            <line x1="{{ '%.2f' % layout.left }}" y1="{{ '%.2f' % y }}" x2="{{ '%.2f' % layout.right }}" y2="{{ '%.2f' % y }}" stroke="{{ theme.grid }}" stroke-width="1"/>
+            {%- endfor %}
+            {%- if component.chart_type == "bar" %}
+            {%- for bar in layout.bars() %}
+            <rect x="{{ '%.2f' % bar.x }}" y="{{ '%.2f' % bar.y }}" width="{{ '%.2f' % bar.width }}" height="{{ '%.2f' % bar.height }}" fill="{{ bar.color }}"/>
+            {%- endfor %}
+            {%- else %}
+            {%- for line in layout.lines() %}
+            <polyline points="{{ line.points }}" fill="none" stroke="{{ line.color }}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            {%- for x, y in line.dots %}
+            <circle cx="{{ '%.2f' % x }}" cy="{{ '%.2f' % y }}" r="3" fill="{{ line.color }}"/>
+            {%- endfor %}
+            {%- endfor %}
+            {%- endif %}
+            <line x1="{{ '%.2f' % layout.left }}" y1="{{ '%.2f' % layout.zero }}" x2="{{ '%.2f' % layout.right }}" y2="{{ '%.2f' % layout.zero }}" stroke="{{ theme.axis }}" stroke-width="1"/>
+            {%- endif %}
+        </svg>
         {%- for label in layout.labels() %}
-        <text x="{{ '%.2f' % label.x }}" y="{{ '%.2f' % label.y }}" text-anchor="middle" fill="#ffffff" font-weight="700">{{ label.text }}</text>
+        {%- set box = label.box(component.width, component.height) %}
+        <span class="rk-chart__label rk-chart__label--{{ box.tone }}" dir="{{ box.dir }}" style="left: {{ box.left }}; top: {{ box.top }}; width: {{ box.width }}; text-align: {{ box.align }};">{{ box.text }}</span>
         {%- endfor %}
-        {%- else %}
-        {%- for y in layout.grid %}
-        <line x1="{{ '%.2f' % layout.left }}" y1="{{ '%.2f' % y }}" x2="{{ '%.2f' % layout.right }}" y2="{{ '%.2f' % y }}" stroke="{{ theme.grid }}" stroke-width="1"/>
-        {%- endfor %}
-        {%- for label in layout.ticks %}
-        <text x="{{ '%.2f' % label.x }}" y="{{ '%.2f' % label.y }}" text-anchor="end" fill="{{ theme.label }}">{{ label.text }}</text>
-        {%- endfor %}
-        {%- if component.chart_type == "bar" %}
-        {%- for bar in layout.bars() %}
-        <rect x="{{ '%.2f' % bar.x }}" y="{{ '%.2f' % bar.y }}" width="{{ '%.2f' % bar.width }}" height="{{ '%.2f' % bar.height }}" fill="{{ bar.color }}"/>
-        {%- endfor %}
-        {%- else %}
-        {%- for line in layout.lines() %}
-        <polyline points="{{ line.points }}" fill="none" stroke="{{ line.color }}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-        {%- for x, y in line.dots %}
-        <circle cx="{{ '%.2f' % x }}" cy="{{ '%.2f' % y }}" r="3" fill="{{ line.color }}"/>
-        {%- endfor %}
-        {%- endfor %}
-        {%- endif %}
-        <line x1="{{ '%.2f' % layout.left }}" y1="{{ '%.2f' % layout.zero }}" x2="{{ '%.2f' % layout.right }}" y2="{{ '%.2f' % layout.zero }}" stroke="{{ theme.axis }}" stroke-width="1"/>
-        {%- for label in layout.values() %}
-        <text x="{{ '%.2f' % label.x }}" y="{{ '%.2f' % label.y }}" text-anchor="middle" fill="{{ theme.label }}">{{ label.text }}</text>
-        {%- endfor %}
-        {%- for label in layout.categories() %}
-        <text x="{{ '%.2f' % label.x }}" y="{{ '%.2f' % label.y }}" text-anchor="middle" fill="{{ theme.label }}">{{ label.text }}</text>
-        {%- endfor %}
-        {%- endif %}
-    </svg>
+    </div>
     {%- if legend %}
     <ul class="rk-chart__legend">
         {%- for name, color in legend %}

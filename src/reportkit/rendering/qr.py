@@ -20,7 +20,7 @@ class QRCodeImage:
         """
         Return a scalable SVG data URI; its size comes from the element that shows it.
         """
-        return self.symbol.svg_data_uri(scale=1, border=self.component.quiet_zone, omitsize=True)
+        return self.symbol.svg_data_uri(scale=1, border=self.component.quiet_zone, omitsize=True, light="#ffffff")
 
     def png(self):
         """
@@ -28,6 +28,6 @@ class QRCodeImage:
         """
         modules = self.symbol.symbol_size(scale=1, border=self.component.quiet_zone)[0]
         buffer = BytesIO()
-        self.symbol.save(buffer, kind="png", scale=max(1, math.ceil(self.component.size / modules)), border=self.component.quiet_zone)
+        self.symbol.save(buffer, kind="png", light="#ffffff", scale=max(1, math.ceil(self.component.size / modules)), border=self.component.quiet_zone)
         buffer.seek(0)
         return buffer

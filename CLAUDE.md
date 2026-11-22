@@ -118,14 +118,16 @@ reportkit/
 │   │   ├── typography/          # Text, Heading, RichText
 │   │   ├── table/               # Table, TableColumn, TableRow, TableCell
 │   │   ├── information/         # KeyValue, InfoGrid
-│   │   ├── media/               # Image, Chart
+│   │   ├── media/               # Image, QRCode, Chart, ChartSeries
 │   │   └── pagination/          # PageBreak, PageNumber, PageCount
 │   ├── builders/                # واجهة Builder: report.py (ReportBuilder)، table.py (TableBuilder)، export.py (ReportExport)
-│   ├── validators/
-│   │   └── table/               # column, cell, row, table: قواعد التحقق خارج المكونات
+│   ├── validators/              # قواعد التحقق خارج المكونات؛ المكوّن يستدعي Validator فقط في __post_init__
+│   │   ├── table/               # column, cell, row, table
+│   │   ├── media/               # image, qr_code, chart
+│   │   └── pagination/          # page_number, page_count
 │   ├── styles/                  # Style وTheme
 │   ├── formatting/              # تنسيق القيم البسيطة للعرض فقط (TableCellFormatter)
-│   ├── rendering/               # RenderingContext وVisitor الأساسي
+│   ├── rendering/               # RenderingContext وVisitor، ومنطق مشترك: qr.py (QRCodeImage: SVG/PNG عبر segno)، chart.py (الألوان و ChartTable)
 │   └── exporters/
 │       ├── base.py
 │       ├── registry.py
@@ -150,8 +152,8 @@ reportkit/
 │       ├── pdf/
 │       │   ├── exporter.py       # PdfExporter: export (bytes) و export_to (مسار/stream)؛ مسار واحد أو أجزاء
 │       │   ├── options.py        # PdfOptions(chunk_rows=500 أو None)
-│       │   ├── chunking/         # flow (صفوف كسولة) → planner (الجزء التالي) → html → layout (قراءة صناديق WeasyPrint) → renderer
-│       │   ├── assembly/         # merger.py (pypdf) و numbering.py (طبقة أرقام الصفحات بعد الدمج)
+│       │   ├── chunking/         # flow (صفوف كسولة) → planner (الجزء التالي) → html → layout (قراءة صناديق WeasyPrint) → renderer؛ slots.py (أماكن PageCount المؤجلة)
+│       │   ├── assembly/         # merger.py (pypdf) و overlay.py (PageOverlay: أرقام الصفحات و PageCount بعد الدمج)
 │       │   ├── conversion.py     # PdfConversionService + WeasyPrintErrorMonitor (مراقبة لكل thread)
 │       │   ├── dependencies.py   # تحميل WeasyPrint الاختياري
 │       │   ├── exceptions.py     # PdfExportError
@@ -181,6 +183,7 @@ from reportkit.builders import ReportBuilder, TableBuilder
 
 report = ReportBuilder("Title").page(margin="10mm 11mm").header(...).table(columns, rows, totals=total).footer(...).page_number().build()
 ReportBuilder("Title").table(columns, rows).export_to("pdf", "report.pdf", context, options=PdfOptions(workers=4))
+ReportBuilder("Title").chart(labels, series, chart_type="bar").qr_code(url, size=88).page_count("Total pages: {pages}")
 ```
 
 - طبقة فوق المكونات فقط: `build()` يُرجع `Report` عاديًا بصفحة واحدة، والبناء المباشر بالمكونات يبقى كما هو. التحقق يبقى في المكونات والـ Validators.
@@ -214,6 +217,8 @@ with open("report.pdf", "wb") as file:              # الحفظ مسؤولية 
 - التقارير الضخمة: `PdfOptions(chunk_rows=500)` افتراضيًا. الجداول المباشرة داخل `Page` (أو `Report`) تُقسَّم إلى أجزاء؛ كل جزء تقرير صغير يُخطط بـ WeasyPrint وتُحذف صفحته الأخيرة غير المكتملة وتُعاد صفوفها مع الجزء التالي، فتنكسر الصفحات كما في المسار الواحد. عرض الأعمدة يُقاس من الجزء الأول ويُثبت (`TableFragment` + `width` بالـ px)، و`rk-pdf-fragment--continued` في `pdf.css` يحاكي استئناف الجدول في صفحة جديدة. الترقيم يُختم بعد الدمج بطبقة شفافة (`string-set`). التقرير الذي يتسع في جزء واحد يُخطط مرة واحدة كما كان.
 - pypdf ضمن `[pdf]`؛ بدونه يُطلق تحذير ويُستخدم المسار الواحد. الصفوف تُقرأ كسولًا ولا تُحمّل كلها، والإجماليات تأتي جاهزة من التطبيق.
 - `export_to(document, target)` يكتب إلى مسار أو stream ثنائي.
+- `PageCount`: في المسار الواحد `counter(pages)` من `pdf.css` (مخفي في المتصفح عبر print.css). في الأجزاء يُرسم مخفيًا (`rk-page-count--deferred`)، ويسجّل `chunking/slots.py` مكانه وخطه من صناديق WeasyPrint، ثم يختم `PageOverlay` الإجمالي النهائي فوقه بعد الدمج (يعمل مع workers أيضًا).
+- `Chart` في HTML/PDF: أشكال SVG تُحسب في `renderers/media/chart/layout.py`، والنصوص HTML فوقها بنسب مئوية لأن نص SVG لا يُشكَّل عربيًا في WeasyPrint. ألوان السلاسل من `--rk-chart-*` في tokens.css.
 - `PdfOptions(workers=N)` (افتراضيًا 1): `ParallelPdfRenderer` يخطط الجزء الأول محليًا لقياس عرض الأعمدة، ثم يرسل HTML الأجزاء الباقية إلى `ProcessPoolExecutor` ويجمعها بالترتيب. كل جزء يحتفظ بصفحته الأخيرة، فتظهر صفحة غير ممتلئة عند كل حد، و`rk-pdf-fragment--continues` يجعل نهاية الجدول كجدول مقسوم. 10 آلاف صف: 181 ث بـ 8 عمليات مقابل 766 ث تسلسليًا.
 - الموارد: الصور المحلية تُضمَّن كـ data URI عبر `AssetResolver`. أثناء التحويل يُسمح فقط بـ `data:`، وبملفات داخل `base_url` إن مُرِّر؛ الشبكة وبقية الملفات المحلية تُمنع ويُرفع `PdfExportError` مع السبب الأصلي.
 - Header/Footer المتكرر (`repeat=True`) يجب أن يأتي قبل المحتوى في الشجرة حتى يظهر من الصفحة الأولى (سلوك running elements في CSS).
@@ -239,7 +244,9 @@ xlsx = ExcelExporter().export(document, context, ExcelOptions(mode="data", strea
 - Decimal: يُكتب كرقم إذا كان ضمن 15 رقمًا معنويًا (دقة Excel)، وإلا يُرفع `ExcelExportError` أو يُكتب نصًا مع `decimal_policy="text"`.
 - `formatted` لا يعمل مع `streaming=True` (يحتاج دمج خلايا وكتابة غير متسلسلة) ويحتفظ بالورقة كاملة في الذاكرة، ويستغرق نحو 2.5 ms لكل صف (50 ألف صف ≈ دقيقتان).
 - للتقارير الضخمة (عشرات الآلاف من الصفوف فأكثر) استخدم `ExcelOptions(mode="data", streaming=True)`: ذاكرة شبه ثابتة (نحو 84 MB لـ 100 ألف صف).
-- غير مدعوم: `Chart` و`PageCount` (وهما بلا Renderer في HTML أيضًا)، والصور البعيدة وصور SVG.
+- `Chart` رسم Excel أصلي: القيم في ورقة مخفية "Chart data" (formatted) أو في ورقة الرسم نفسها (data). `PageCount` في القسم الأيمن من تذييل الطباعة، و`QRCode` صورة PNG.
+- `export_to(document, target, context, options)` يكتب إلى مسار أو stream عبر ملف مؤقت (لا يُحمَّل الملف كاملًا في الذاكرة).
+- غير مدعوم: الصور البعيدة وصور SVG.
 
 ## تصدير Word
 
@@ -250,6 +257,7 @@ docx_bytes = WordExporter().export(document, context)
 WordExporter().export_to(document, "report.docx", context)   # مسار أو stream ثنائي
 ```
 
+- `Chart` يُكتب جدولًا بقيمه (`rendering/chart.py: ChartTable`) لأن python-docx لا يرسم المخططات، و`PageCount` حقل NUMPAGES، و`QRCode` صورة PNG.
 - python-docx اعتماد اختياري: `pip install -e ".[word]"`. البناء مثل Excel: `word/document` (المستند والمحرك)، `word/renderers` (table/ و layout/)، `word/styles`، `word/values`.
 - الشبكات (Grid/Row/InfoGrid) جداول بلا حدود، والصناديق المؤطرة جدول بخلية واحدة؛ RTL عبر `w:bidi` و`w:bidiVisual`.
 - Header/Footer المتكرر يذهب إلى رأس/تذييل صفحة Word، و`PageNumber` يستخدم حقول PAGE و NUMPAGES.
