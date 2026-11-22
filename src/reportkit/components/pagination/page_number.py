@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from ...core.component import Component
+from ...validators.pagination.page_number import PageNumberValidator
 
 
 @dataclass(kw_only=True)
@@ -13,9 +14,6 @@ class PageNumber(Component):
 
     def __post_init__(self):
         """
-        Validate page number format.
+        Validate the page number format.
         """
-        if not isinstance(self.format, str):
-            raise TypeError("Page number format must be a string.")
-        if not self.format:
-            raise ValueError("Page number format cannot be empty.")
+        PageNumberValidator.validate(self)

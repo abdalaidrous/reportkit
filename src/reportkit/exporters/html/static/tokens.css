@@ -65,4 +65,16 @@
     --rk-table-compact-padding-y: 5px;
     --rk-table-compact-padding-x: 8px;
     --rk-table-caption-padding: var(--rk-space-4);
+
+    /* Charts: series colors in order, then the axis, grid and label colors. */
+    --rk-chart-1: var(--rk-accent);
+    --rk-chart-2: #d08c4a;
+    --rk-chart-3: #5f9e7a;
+    --rk-chart-4: #b5596b;
+    --rk-chart-5: #8a74b8;
+    --rk-chart-6: #4fa3a5;
+    --rk-chart-axis-color: var(--rk-gray-500);
+    --rk-chart-grid-color: var(--rk-gray-200);
+    --rk-chart-label-color: var(--rk-gray-600);
+    --rk-chart-label-size: var(--rk-font-xs);
 }

@@ -11,13 +11,15 @@ class HtmlRenderingEngine:
     Coordinate HTML rendering using registered component renderers.
     """
 
-    def __init__(self, registry=None, templates=None, styles=None):
+    def __init__(self, registry=None, templates=None, styles=None, defer_page_count=False):
         """
-        Initialize shared HTML rendering services.
+        Initialize shared HTML rendering services; defer_page_count lays PageCount out hidden, for PDF chunks whose
+        page total is only known once they are merged.
         """
         self.registry = registry if registry is not None else HtmlRendererRegistry
         self.templates = templates if templates is not None else HtmlTemplateEngine()
         self.styles = styles if styles is not None else HtmlStyleResolver()
+        self.defer_page_count = defer_page_count
 
     def render(self, component: Component, context: RenderingContext) -> str:
         """

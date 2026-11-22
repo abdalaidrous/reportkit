@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from ...core.component import Component
+from ...validators.media.image import ImageValidator
 
 
 @dataclass(kw_only=True)
@@ -19,7 +20,4 @@ class Image(Component):
         """
         Validate image properties.
         """
-        if not isinstance(self.src, str) or not self.src.strip():
-            raise ValueError("Image source must be a non-empty string.")
-        if self.fit not in {"contain", "cover", "fill", "none", "scale-down"}:
-            raise ValueError("Unsupported image fit.")
+        ImageValidator.validate(self)

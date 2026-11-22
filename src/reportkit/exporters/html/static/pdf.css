@@ -96,6 +96,26 @@
 .rk-grid--rtl.rk-grid--cols-12 > :nth-child(12n+12) { grid-column: 1; }
 
 /*
+ * The page total; a deferred count (a chunk of a large report) keeps its line hidden and is stamped once the merged
+ * page total is known. print.css hides it for browsers, and this user stylesheet needs !important to win over it.
+ */
+.rk-page-count {
+    display: block !important;
+}
+
+.rk-page-count__value::after {
+    content: counter(pages);
+}
+
+.rk-page-count--deferred {
+    visibility: hidden;
+}
+
+.rk-page-count--deferred .rk-page-count__value::after {
+    content: "00";
+}
+
+/*
  * Large reports are laid out in chunks that stop inside a table. A fragment continued from the previous chunk starts
  * like a table resumed on a new page, where WeasyPrint slices the start decoration of the box away; a fragment the
  * next chunk continues ends like a table split by a page break (parallel layout keeps that last page).

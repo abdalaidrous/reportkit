@@ -1,7 +1,7 @@
 from .document import Footer, Header, Page, Report
 from .information import InfoGrid, KeyValue
 from .layout import Box, Column, Divider, Grid, Row, Section, Spacer
-from .media import Chart, Image
+from .media import Chart, ChartSeries, Image, QRCode
 from .pagination import PageBreak, PageCount, PageNumber
 from .table import Table, TableCell, TableColumn, TableRow, TableStyle
 from .typography import Heading, RichText, Text, TextSpan
@@ -28,6 +28,7 @@ COMPONENT_TYPES = {
     "info_grid": InfoGrid,
     "image": Image,
     "chart": Chart,
+    "qr_code": QRCode,
     "page_break": PageBreak,
     "page_number": PageNumber,
     "page_count": PageCount,
@@ -37,9 +38,9 @@ for name, component in COMPONENT_TYPES.items():
     ComponentRegistry.register(name, component)
 
 __all__ = [
-    "Box", "Chart", "Column", "Divider", "Footer", "Grid", "Header",
+    "Box", "Chart", "ChartSeries", "Column", "Divider", "Footer", "Grid", "Header",
     "Heading", "Image", "InfoGrid", "KeyValue", "Page", "PageBreak",
-    "PageCount", "PageNumber", "Report", "Row", "Section", "Spacer",
+    "PageCount", "PageNumber", "QRCode", "Report", "Row", "Section", "Spacer",
     "RichText", "Table", "TableCell", "TableColumn", "TableRow", "TableStyle",
     "Text", "TextSpan",
 ]

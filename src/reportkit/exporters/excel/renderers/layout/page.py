@@ -22,3 +22,16 @@ class PageNumberRenderer:
         """
         engine.sheet.set_footer(component.format)
         return 0
+
+
+class PageCountRenderer:
+    """
+    Render the page total in the printed footer: cells have no pages, so only the print footer can show it.
+    """
+
+    def render(self, component, context, engine, region):
+        """
+        Put the page count format in the right footer section, beside the centred page number; it takes no rows.
+        """
+        engine.sheet.set_footer(component.format, "right")
+        return 0

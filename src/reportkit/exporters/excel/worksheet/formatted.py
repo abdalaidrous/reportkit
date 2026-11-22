@@ -135,11 +135,11 @@ class FormattedSheet:
         if not self.worksheet.print_title_rows:
             self.worksheet.print_title_rows = f"{row}:{row}"
 
-    def set_footer(self, page_format):
+    def set_footer(self, page_format, section="center"):
         """
-        Print page numbers in the footer, turning {page} and {pages} into Excel codes.
+        Print page numbers or the page total in one footer section, turning {page} and {pages} into Excel codes.
         """
-        self.worksheet.oddFooter.center.text = page_format.replace("{page}", "&P").replace("{pages}", "&N")
+        getattr(self.worksheet.oddFooter, section).text = page_format.replace("{page}", "&P").replace("{pages}", "&N")
 
     def set_page(self, page):
         """

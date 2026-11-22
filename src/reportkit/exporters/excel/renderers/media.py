@@ -3,6 +3,7 @@ import binascii
 import math
 from io import BytesIO
 
+from ....rendering.qr import QRCodeImage
 from ...html.assets import AssetResolver
 from ..exceptions import ExcelExportError
 
@@ -37,6 +38,19 @@ class ImageRenderer:
             return BytesIO(base64.b64decode(payload, validate=True))
         except binascii.Error as error:
             raise ExcelExportError(f"Image data is not valid base64: {component.src}") from error
+
+
+class QRCodeRenderer:
+    """
+    Render a QR code as a PNG image anchored at the region's first cell.
+    """
+
+    def render(self, component, context, engine, region):
+        """
+        Place the QR code at its declared size and return the rows it covers.
+        """
+        height = engine.sheet.add_image(QRCodeImage(component).png(), region.row, region.column, region.width, component.size, component.size)
+        return max(1, math.ceil(height / ROW_HEIGHT_PIXELS))
 
 
 def pixels(value):

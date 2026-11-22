@@ -52,3 +52,7 @@
 .rk-rich-text span[dir="ltr"] {
     direction: ltr;
 }
+
+.rk-page-count__text {
+    unicode-bidi: isolate;
+}

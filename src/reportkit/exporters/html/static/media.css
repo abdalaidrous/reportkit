@@ -8,3 +8,9 @@
 .rk-image--logo {
     max-height: 90px;
 }
+
+.rk-qr-code {
+    display: block;
+    max-width: 100%;
+    image-rendering: pixelated;
+}

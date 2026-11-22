@@ -11,6 +11,24 @@ PAGE_FONT_SIZE = 11
 PAGE_COLOR = "#555555"
 
 
+def render_page_part(paragraph, part, style, direction="ltr"):
+    """
+    Render a Word page field or a static text run.
+    """
+    if part in PAGE_FIELDS:
+        add_field(paragraph, PAGE_FIELDS[part])
+    elif part:
+        add_run(paragraph, part, style, direction)
+
+
+def render_page_format(paragraph, format_text, style, direction="ltr"):
+    """
+    Render formatted page numbering by splitting static text and Word fields.
+    """
+    for part in PAGE_PATTERN.split(format_text):
+        render_page_part(paragraph, part, style, direction)
+
+
 class PageBreakRenderer:
     """
     Render a page break.
@@ -37,7 +55,7 @@ class PageNumberRenderer:
         style = self.get_style(position)
 
         format_paragraph(paragraph, style, "ltr")
-        self.render_parts(paragraph, component.format, style)
+        render_page_format(paragraph, component.format, style)
 
     @staticmethod
     def get_paragraph(engine, position):
@@ -54,20 +72,21 @@ class PageNumberRenderer:
         """
         return Style(text_align=position.split("-")[1], font_size=PAGE_FONT_SIZE, color=PAGE_COLOR)
 
-    @classmethod
-    def render_parts(cls, paragraph, format_text, style):
-        """
-        Render page number fields and static text.
-        """
-        for part in PAGE_PATTERN.split(format_text):
-            cls.render_part(paragraph, part, style)
 
-    @staticmethod
-    def render_part(paragraph, part, style):
+class PageCountRenderer:
+    """
+    Render the page total as a paragraph with a Word NUMPAGES field, in the body or a header or footer.
+    """
+
+    def render(self, component, context, engine, area):
         """
-        Render a Word field or a text run.
+        Write the text around the page total in the component style.
         """
-        if part in PAGE_FIELDS:
-            add_field(paragraph, PAGE_FIELDS[part])
-        elif part:
-            add_run(paragraph, part, style, "ltr")
+        style = context.resolve_style(component)
+        paragraph = area.paragraph()
+        before, after = component.parts
+
+        format_paragraph(paragraph, style, engine.direction)
+        render_page_part(paragraph, before, style)
+        add_field(paragraph, PAGE_FIELDS["{pages}"])
+        render_page_part(paragraph, after, style)

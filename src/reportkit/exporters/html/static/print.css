@@ -23,6 +23,11 @@
     display: none;
 }
 
+/* The page total needs a paged layout: it is shown by pdf.css, never in the browser. */
+.rk-page-count {
+    display: none;
+}
+
 .rk-header {
     width: 100%;
     box-sizing: border-box;

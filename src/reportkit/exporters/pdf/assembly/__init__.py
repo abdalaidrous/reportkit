@@ -1,4 +1,4 @@
 from .merger import PdfMerger
-from .numbering import PageNumberOverlay
+from .overlay import PageOverlay
 
-__all__ = ["PageNumberOverlay", "PdfMerger"]
+__all__ = ["PageOverlay", "PdfMerger"]

@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 
 from ....components.document import Footer, Header, Page
-from ....components.pagination import PageNumber
+from ....components.pagination import PageCount, PageNumber
 
 
 @dataclass
@@ -12,12 +12,13 @@ class PageComponents:
 
     pages: list = field(default_factory=list)
     numbers: list = field(default_factory=list)
+    counts: list = field(default_factory=list)
     running: list = field(default_factory=list)
 
 
 class HtmlPageComponentFinder:
     """
-    Collect pages, page numbers and repeating headers/footers in one tree walk.
+    Collect pages, page numbers, page counts and repeating headers/footers in one tree walk.
     """
 
     @classmethod
@@ -39,6 +40,9 @@ class HtmlPageComponentFinder:
 
         elif isinstance(component, PageNumber):
             found.numbers.append(component)
+
+        elif isinstance(component, PageCount):
+            found.counts.append(component)
 
         elif isinstance(component, (Header, Footer)) and component.repeat:
             found.running.append(component)

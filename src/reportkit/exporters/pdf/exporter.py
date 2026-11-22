@@ -6,7 +6,7 @@ from ...components.document import Report
 from ...rendering.context import RenderingContext
 from ..base import BaseExporter
 from ..html.exporter import HtmlExporter
-from .assembly import PageNumberOverlay, PdfMerger
+from .assembly import PageOverlay, PdfMerger
 from .chunking import ChunkedPdfRenderer, ParallelPdfRenderer
 from .conversion import PdfConversionService
 from .dependencies import PYPDF_HELP, load_pypdf
@@ -71,7 +71,7 @@ class PdfExporter(BaseExporter):
             return cls.write(target, first)  # The whole report fit in one chunk: a single-pass layout.
 
         merger = cls.merge_chunks(first, chunks)
-        cls.apply_numbering(merger, document, context)
+        cls.stamp(merger, PageOverlay(document, context, renderer.counts.slots))
         merger.write(target)
 
     @staticmethod
@@ -98,13 +98,11 @@ class PdfExporter(BaseExporter):
         return merger
 
     @staticmethod
-    def apply_numbering(merger, document, context):
+    def stamp(merger, overlay):
         """
-        Stamp the merged pages with their final page numbers when the report defines page numbering.
+        Stamp the merged pages with their final page numbers and page counts when the report shows them.
         """
-        overlay = PageNumberOverlay(document, context)
-
-        if overlay.numbering:
+        if overlay.needed:
             merger.stamp(overlay.pdfs(merger.page_count))
 
     @staticmethod
