@@ -58,6 +58,7 @@ test = [
 Homepage = "https://github.com/abdalaidrous/reportkit"
 Repository = "https://github.com/abdalaidrous/reportkit"
 Issues = "https://github.com/abdalaidrous/reportkit/issues"
+Changelog = "https://github.com/abdalaidrous/reportkit/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["src"]
