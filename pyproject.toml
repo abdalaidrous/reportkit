@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 # The distribution is "pyreportkit"; the import name is "reportkit".
 name = "pyreportkit"
-version = "0.2.0"
+version = "0.2.1"
 description = "Build bilingual (Arabic/English, RTL/LTR) reports from reusable components and export them to HTML, PDF, Excel and Word."
 readme = "README.md"
 requires-python = ">=3.10"
