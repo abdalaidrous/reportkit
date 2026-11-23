@@ -23,6 +23,15 @@ def table_styles(base=Style()):
     }
 
 
+def get_header_style(component, styles):
+    """
+    Combine the header, ruled and the table's own header styles.
+    """
+    table_style = component.table_style
+    style = styles["header"].merge(styles["ruled"]) if table_style.ruled else styles["header"]
+    return style.merge(table_style.header_style) if table_style.header_style is not None else style
+
+
 def get_row_style(component, table_row, index, styles):
     """
     Combine the table, striping, row kind and row styles from the shared table styles.

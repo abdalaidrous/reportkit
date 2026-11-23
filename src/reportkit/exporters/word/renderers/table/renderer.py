@@ -1,6 +1,6 @@
 from .....rendering.table import get_entries, header_text, place_cells
 from .....styles.style import Style
-from .....styles.table import get_row_style, table_styles
+from .....styles.table import get_header_style, get_row_style, table_styles
 from .....styles.tokens import token
 from .....validators.table.table import TableValidator
 from ...exceptions import WordExportError
@@ -107,7 +107,7 @@ class TableRenderer:
         """
         Resolve the table header style.
         """
-        return styles["header"].merge(styles["ruled"]) if component.table_style.ruled else styles["header"]
+        return get_header_style(component, styles)
 
     @staticmethod
     def render_header_cell(cell, column, style, direction):

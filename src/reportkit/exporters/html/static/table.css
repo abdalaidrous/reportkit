@@ -63,6 +63,12 @@
     font-weight: 400;
 }
 
+/* A header given its own style (TableStyle.header_style): subtitles follow its text color, slightly lighter. */
+.rk-table-th--styled .rk-table-th__subtitle {
+    color: inherit;
+    opacity: 0.8;
+}
+
 /* Each line of a plain value is its own block with a resolved dir, so "12:47 AM" stays LTR in RTL tables. */
 .rk-table-cell__line {
     display: block;
@@ -127,10 +133,14 @@
     background: var(--rk-table-hover-bg);
 }
 
+/* The compact size is set on the table, so a Style font size on the table still applies to its cells. */
+.rk-table--compact {
+    font-size: var(--rk-font-xs);
+}
+
 .rk-table--compact th,
 .rk-table--compact td {
     padding: var(--rk-table-compact-padding-y) var(--rk-table-compact-padding-x);
-    font-size: var(--rk-font-xs);
 }
 
 /* Row kinds */

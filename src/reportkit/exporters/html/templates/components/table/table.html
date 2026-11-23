@@ -8,7 +8,7 @@
         <thead>
             <tr>
                 {% for th in header %}
-                <th scope="col" class="rk-table-th{% if th.nowrap %} rk-table-th--nowrap{% endif %}" style="text-align: {{ th.align }}">
+                <th scope="col" class="rk-table-th{% if th.nowrap %} rk-table-th--nowrap{% endif %}{% if th.style %} rk-table-th--styled{% endif %}" style="text-align: {{ th.align }}{% if th.style %}; {{ th.style }}{% endif %}">
                     <span class="rk-table-th__title"{% if th.title_dir %} dir="{{ th.title_dir }}"{% endif %}>{{ th.title }}</span>
                     {%- if th.subtitle %}<span class="rk-table-th__subtitle"{% if th.subtitle_dir %} dir="{{ th.subtitle_dir }}"{% endif %}>{{ th.subtitle }}</span>{% endif %}
                 </th>

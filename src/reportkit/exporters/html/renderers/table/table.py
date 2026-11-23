@@ -24,7 +24,8 @@ class TableRenderer(BaseHtmlRenderer):
         style = engine.styles.resolve(context.resolve_style(component))
         rows = self.prepare_rows(component, context, engine)
         footer = self.prepare_row(component.footer, component.columns, context, engine) if component.footer else None
-        header = [self.prepare_header(column) for column in component.columns]
+        header_style = engine.styles.resolve(component.table_style.header_style) if component.table_style.header_style is not None else ""
+        header = [self.prepare_header(column, header_style) for column in component.columns]
         return engine.templates.render(self.template_name, container_class=self.container_class(component), table_class=self.get_class(component.table_style), columns=component.columns, header=header, caption=component.header, rows=rows, footer=footer, show_header=component.table_style.show_header, style=style)
 
     def prepare_rows(self, component, context, engine):
@@ -52,11 +53,11 @@ class TableRenderer(BaseHtmlRenderer):
         return self.get_container_class(component.table_style)
 
     @staticmethod
-    def prepare_header(column):
+    def prepare_header(column, style=""):
         """
-        Prepare one table header cell.
+        Prepare one table header cell, with the table's header style as inline CSS.
         """
-        return {"title": column.title, "subtitle": column.subtitle, "title_dir": text_direction(column.title), "subtitle_dir": text_direction(column.subtitle), "align": column.header_align or column.align, "nowrap": column.nowrap}
+        return {"title": column.title, "subtitle": column.subtitle, "title_dir": text_direction(column.title), "subtitle_dir": text_direction(column.subtitle), "align": column.header_align or column.align, "nowrap": column.nowrap, "style": style}
 
     @staticmethod
     def get_class(table_style):

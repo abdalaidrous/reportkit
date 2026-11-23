@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from ...styles.style import Style
+
 
 @dataclass(frozen=True, kw_only=True)
 class TableStyle:
@@ -16,3 +18,4 @@ class TableStyle:
     show_header: bool = True
     repeat_header: bool = True
     avoid_row_break: bool = True
+    header_style: Style | None = None  # Merged over the header cells (for example a brand background and text color).
